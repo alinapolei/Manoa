@@ -1,20 +1,27 @@
 package sample;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import java.io.*;
 import java.util.*;
 
 public class ReadFile {
-    public ReadFile(String path, HashSet<String> hashSet){
+
+    public ReadFile(String path, HashSet<Element> hashSet) {
         List<File> allFiles = new ArrayList<File>();
         getAllFiles(path, allFiles);
         separateDocuments(allFiles, hashSet);
         System.out.println("num of files" + allFiles.size());
+        System.out.println(hashSet.size());
     }
 
-    public void getAllFiles(String path, List<File> allFiles){
+    public void getAllFiles(String path, List<File> allFiles) {
         File directory = new File(path);
         File[] fileList = directory.listFiles();
-        if(fileList != null) {
+        if (fileList != null) {
             for (File file : fileList) {
                 if (file.isFile())
                     allFiles.add(file);
@@ -25,9 +32,30 @@ public class ReadFile {
     }
 
 
+    private void separateDocuments(List<File> allFiles, HashSet<Element> hashSet) {
 
-    private void separateDocuments(List<File> allFiles, HashSet<String> hashSet) {
-        int sumCounters = 0;
+        for (File file : allFiles) {
+            try {
+                int i=0;
+                Document doc = Jsoup.parse(file, "utf-8");
+                Elements x = doc.getElementsByTag("Doc");
+                System.out.println(x.size());
+                for (i=0;i<x.size();i++)
+                    hashSet.add(x.get(i));
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+
+
+
+
+
+        /*int sumCounters = 0;
         String line = "";
         String content = "";
         for (File file : allFiles){
@@ -57,5 +85,5 @@ public class ReadFile {
             }
         }
         System.out.println("sum docs:" + sumCounters);
+    }*/
     }
-}
