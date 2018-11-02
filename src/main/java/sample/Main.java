@@ -5,21 +5,25 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashSet;
+import java.util.List;
 
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        HashSet<String> docs = new HashSet<String>();
-        //ReadFile rf = new ReadFile("C:\\Users\\alina\\Documents\\semester 5\\IR\\corpus", docs);
+        HashSet<Element> docs = new HashSet<>();
 
-        docs.add(new String(Files.readAllBytes(new File("C:\\Users\\alina\\Desktop\\FB396150\\New").toPath())));
-        Parse parse = new Parse(docs);
-
-
+        ReadFile rf = new ReadFile("C:\\Users\\Dror\\Desktop\\corpus",docs);
 
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Hello World");
@@ -28,7 +32,9 @@ public class Main extends Application {
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+
+
         launch(args);
     }
 }
