@@ -16,7 +16,7 @@ public class Main extends Application {
         HashSet<String> docs = new HashSet<String>();
         //ReadFile rf = new ReadFile("C:\\Users\\alina\\Documents\\semester 5\\IR\\corpus", docs);
 
-        docs.add(new String(Files.readAllBytes(new File("C:\\Users\\alina\\Desktop\\FB396150\\FB").toPath())));
+        docs.add(new String(Files.readAllBytes(new File("C:\\Users\\alina\\Desktop\\FB396150\\New").toPath())));
         Parse parse = new Parse(docs);
 
 
