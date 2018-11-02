@@ -1,17 +1,18 @@
 package sample;
-
-import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.*;
 
 public class Parse {
     public Parse(HashSet<String> docs) {
         //docs is the documents after readFile separate them all
+        DateFormatSymbols dateFormatSymbols = new DateFormatSymbols();
+        List<String> months = Arrays.asList(dateFormatSymbols.getMonths());
+        months.replaceAll(String::toLowerCase);
+        List<String> shortMonths = Arrays.asList(dateFormatSymbols.getShortMonths());
+        shortMonths.replaceAll(String::toLowerCase);
+
         for (String doc : docs){
 
             String[] tokens = doc.split(" ");
@@ -38,10 +39,13 @@ public class Parse {
                         tok = tok +"000B";
                     else if(tokens[i+1].matches("percent") || tokens[i+1].matches("percentage"))
                         tok = tok + "%";
-                    else if(Arrays.asList(new DateFormatSymbols().getMonths()).contains(tokens[i+1])) {
+                    else if(months.contains(tokens[i+1].toLowerCase()) || shortMonths.contains(tokens[i+1].toLowerCase())) {
                         try {
-                            Date date = new SimpleDateFormat("MMMM").parse(tokens[i+1]);
-
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd");
+                            Date date = new Date();
+                            date.setMonth(new SimpleDateFormat("MMMM").parse(tokens[i+1]).getMonth());
+                            date.setDate(Integer.parseInt(tok));
+                            tok = simpleDateFormat.format(date);
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
@@ -82,6 +86,27 @@ public class Parse {
                         tok = parts[0].substring(0, parts[0].length()-6) + "." + parts[0].substring(parts[0].length()-6) + parts[1] + "M";
                     else if(parts[0].length()>9 && parts[0].length()<=12)
                         tok = parts[0].substring(0, parts[0].length()-9) + "." + parts[0].substring(parts[0].length()-9) + parts[1] + "B";
+                }
+
+                if(!tok.equals("") && i+1<tokens.length && !tokens[i+1].equals("") && (months.contains(tok.toLowerCase()) || shortMonths.contains(tok.toLowerCase()))){
+                    SimpleDateFormat simpleDateFormat;
+                    Calendar date = new GregorianCalendar();
+
+                    if(tokens[i+1].length() == 4){//the date is with year
+                        date.set(Calendar.YEAR, Integer.parseInt(tokens[i+1]));
+                        simpleDateFormat = new SimpleDateFormat("yyyy-MM");
+                    }
+                    else {//the date is with month
+                        simpleDateFormat = new SimpleDateFormat("MM-dd");
+                        date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tokens[i+1]));
+                    }
+                    try {
+                        date.set(Calendar.MONTH, new SimpleDateFormat("MMMM").parse(tok).getMonth());
+                        tok = simpleDateFormat.format(date.getTime());
+                        tokens[i + 1] = "";
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 if(!tok.equals("") && tok.charAt(tok.length()-1) == 'm')
