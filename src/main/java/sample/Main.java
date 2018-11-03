@@ -17,6 +17,10 @@ import java.io.File;
 
 public class Main extends Application {
 
+
+    public Set<String> stopWords = new HashSet<>();
+
+
     @Override
     public void start(Stage primaryStage) throws Exception{
         //HashSet<Doc> docs = new HashSet<>();

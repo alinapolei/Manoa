@@ -8,19 +8,18 @@ import java.util.*;
 
 
 public class Parse {
-    public Parse(HashSet<String> docs) { //docs is the documents after readFile separate them all
+    public Parse(HashSet<String> docs,HashSet <String> stopWords) { //docs is the documents after readFile separate them all
         DateFormatSymbols dateFormatSymbols = new DateFormatSymbols();
         List<String> months = Arrays.asList(dateFormatSymbols.getMonths());
         months.replaceAll(String::toLowerCase);
         List<String> shortMonths = Arrays.asList(dateFormatSymbols.getShortMonths());
         shortMonths.replaceAll(String::toLowerCase);
 
-        //Dror
-        Set<String> temp=new HashSet<>();
+
 
 
         Stemmer stemmer = new Stemmer();
-        HashSet<String> terms = new HashSet<>();
+        Set<String> terms = new HashSet<>();
 
         for (String doc : docs){
             String[] tokens = doc.split(" ");
@@ -155,31 +154,25 @@ public class Parse {
                     //------put here stop words and parse for words
                         if (tok.startsWith("\n"))
                             tok = tok.replace("\n", "");
-                        else if(tok.startsWith("("))
-                            tok = tok.replace("(", "");
-                        else if(tok.endsWith("),"))
-                            tok = tok.replace("),", "");
                         String tmp = Character.toUpperCase(tok.toCharArray()[0]) + tok.substring(1, tok.length());
                         if(tok.equals(tok.toUpperCase()))
-                            if(!temp.contains(tok.toLowerCase())&&!temp.contains(tmp))
-                                temp.add(tok);
-                            else{
-                                temp.remove(tok);
-                                temp.add(tok.toLowerCase());
+                            if(terms.contains(tok.toLowerCase())||terms.contains(tmp))
+                            {
+                                terms.remove(tok);
+                                tok=(tok.toLowerCase());
                             }
                         else if (tok.equals(tok.toLowerCase()))
-                            if(!temp.contains(tok.toUpperCase())&&!temp.contains(tmp))
-                                temp.add(tok);
-                            else{
-                                temp.remove(tok);
-                                temp.add(tok.toLowerCase());
+                            if(terms.contains(tok.toUpperCase())||terms.contains(tmp))
+                            {
+                                terms.remove(tok);
+                                tok=(tok.toLowerCase());
                             }
                         else if (tok.equals(tmp))
-                            if(!temp.contains(tok.toUpperCase())&&!temp.contains(tok.toLowerCase()))
-                                temp.add(tok.toUpperCase());
-                            else {
-                                temp.remove(tok);
-                                temp.add(tok.toLowerCase());
+                            if(terms.contains(tok.toUpperCase())||terms.contains(tok.toLowerCase()))
+                                tok=(tok.toUpperCase());
+                             {
+                                terms.remove(tok);
+                                tok=(tok.toLowerCase());
                             }
                     }
 
@@ -187,9 +180,15 @@ public class Parse {
                 tokens[i] = tok;
                 terms.add(tok);
             }
-
+            removeStopWords(terms,stopWords);
             doc = String.join(" ", tokens);
             System.out.println(doc);
         }
+    }
+
+    private void removeStopWords(Set<String> terms, HashSet<String> stopWords) {
+            for (int i=0;i<stopWords.size();i++)
+                if(terms.contains(stopWords.toArray()[i]))
+                    terms.remove(stopWords.toArray()[i]);
     }
 }
