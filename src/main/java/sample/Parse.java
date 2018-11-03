@@ -15,6 +15,10 @@ public class Parse {
         List<String> shortMonths = Arrays.asList(dateFormatSymbols.getShortMonths());
         shortMonths.replaceAll(String::toLowerCase);
 
+        //Dror
+        Set<String> temp=new HashSet<>();
+
+
         Stemmer stemmer = new Stemmer();
         HashSet<String> terms = new HashSet<>();
 
@@ -149,7 +153,36 @@ public class Parse {
                 if(tok.matches("[A-Za-z]+")) {
                     tok = stemmer.stem(tok);
                     //------put here stop words and parse for words
-                }
+                        if (tok.startsWith("\n"))
+                            tok = tok.replace("\n", "");
+                        else if(tok.startsWith("("))
+                            tok = tok.replace("(", "");
+                        else if(tok.endsWith("),"))
+                            tok = tok.replace("),", "");
+                        String tmp = Character.toUpperCase(tok.toCharArray()[0]) + tok.substring(1, tok.length());
+                        if(tok.equals(tok.toUpperCase()))
+                            if(!temp.contains(tok.toLowerCase())&&!temp.contains(tmp))
+                                temp.add(tok);
+                            else{
+                                temp.remove(tok);
+                                temp.add(tok.toLowerCase());
+                            }
+                        else if (tok.equals(tok.toLowerCase()))
+                            if(!temp.contains(tok.toUpperCase())&&!temp.contains(tmp))
+                                temp.add(tok);
+                            else{
+                                temp.remove(tok);
+                                temp.add(tok.toLowerCase());
+                            }
+                        else if (tok.equals(tmp))
+                            if(!temp.contains(tok.toUpperCase())&&!temp.contains(tok.toLowerCase()))
+                                temp.add(tok.toUpperCase());
+                            else {
+                                temp.remove(tok);
+                                temp.add(tok.toLowerCase());
+                            }
+                    }
+
 
                 tokens[i] = tok;
                 terms.add(tok);
