@@ -6,15 +6,21 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.*;
 
 public class ReadFile {
 
-    public ReadFile(String path, HashSet<Doc> hashSet) {
+    public ReadFile(String path, HashSet<Doc> hashSet,Set<String> stopWords) {
         List<File> allFiles = new ArrayList<File>();
         getAllFiles(path, allFiles);
         separateDocuments(allFiles, hashSet);
         System.out.println("num of files" + allFiles.size());
+        try {
+            setStopWords(stopWords);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         //System.out.println(hashSet.size());
     }
 
@@ -75,7 +81,12 @@ public class ReadFile {
 
     }
 
-
+    public void setStopWords(Set<String> stopWords) throws IOException {
+        File file=new File("C:\\Users\\Dror\\Desktop\\Stop_Words.txt");
+        String []stopWordsArray =(String.join("\n", Files.readAllLines(file.toPath()))).split("\n");
+        for (int i=0;i<stopWordsArray.length;i++)
+            stopWords.add(stopWordsArray[i]);
+    }
 
 
 

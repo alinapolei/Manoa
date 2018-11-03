@@ -8,7 +8,7 @@ import java.util.*;
 
 
 public class Parse {
-    public Parse(HashSet<Doc> docs,HashSet <String> stopWords) { //docs is the documents after readFile separate them all
+    public Parse(HashSet<Doc> docs,Set <String> stopWords) { //docs is the documents after readFile separate them all
         DateFormatSymbols dateFormatSymbols = new DateFormatSymbols();
         List<String> months = Arrays.asList(dateFormatSymbols.getMonths());
         months.replaceAll(String::toLowerCase);
@@ -188,7 +188,7 @@ public class Parse {
         }
     }
 
-    private void removeStopWords(Set<String> terms, HashSet<String> stopWords) {
+    private void removeStopWords(Set<String> terms, Set<String> stopWords) {
             for (int i=0;i<stopWords.size();i++)
                 if(terms.contains(stopWords.toArray()[i]))
                     terms.remove(stopWords.toArray()[i]);
