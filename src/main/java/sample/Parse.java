@@ -1,6 +1,5 @@
 package sample;
 import org.jsoup.helper.StringUtil;
-
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,14 +13,8 @@ public class Parse {
         months.replaceAll(String::toLowerCase);
         List<String> shortMonths = Arrays.asList(dateFormatSymbols.getShortMonths());
         shortMonths.replaceAll(String::toLowerCase);
-
-
-
-
         Stemmer stemmer = new Stemmer();
         Set<String> terms = new HashSet<>();
-
-
 
         for (Doc doc : docs){
             String[] tokens = doc.docToString().split(" ");
@@ -30,11 +23,11 @@ public class Parse {
                 boolean isDollar = false;
 
                 //clean the token -> remove , . | \n from the start and the end
-                if(tok.equals("")) continue;
-                if(tok.startsWith(".") || tok.startsWith(",") || tok.startsWith("|")  || tok.startsWith("(") || tok.startsWith(")"))
+                while ((!tok.matches("^\\w.*") || tok.startsWith("\n")) && !tok.equals(""))
                     tok = tok.substring(1, tok.length());
-                if(tok.endsWith(".") || tok.endsWith(",") || tok.endsWith("|") || tok.endsWith("(") || tok.endsWith(")"))
+                while ((!tok.matches(".*\\w$") || tok.endsWith("\n")) && !tok.startsWith("%") && !tok.equals(""))
                     tok = tok.substring(0, tok.length()-1);
+                if(tok.equals("")) continue;
 
                 //parsing for numbers, prises, percent
                 if(!tok.equals("") && (tok.charAt(0) == '$' || tok.charAt(tok.length()-1) == '$')) {
