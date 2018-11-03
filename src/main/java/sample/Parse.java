@@ -22,8 +22,9 @@ public class Parse {
         Set<String> terms = new HashSet<>();
 
 
-
+        int docnumber=1;
         for (Doc doc : docs){
+            System.out.println("Doc number: "+ docnumber);
             String[] tokens = doc.docToString().split(" ");
             for(int i=0; i<tokens.length; i++){
                 String tok = tokens[i];
@@ -182,10 +183,12 @@ public class Parse {
                 tokens[i] = tok;
                 terms.add(tok);
             }
-            removeStopWords(terms,stopWords);
-            String docc = String.join(" ", tokens);
-            System.out.println(docc);
+           // String docc = String.join(" ", tokens);
+            //System.out.println(docc);
+            docnumber++;
         }
+        removeStopWords(terms,stopWords);
+        System.out.println("done");
     }
 
     private void removeStopWords(Set<String> terms, Set<String> stopWords) {
