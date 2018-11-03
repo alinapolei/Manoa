@@ -26,16 +26,10 @@ public class Parse {
 
                 //clean the token -> remove , . | \n from the start and the end
                 if(tok.equals("")) continue;
-                if(tok.startsWith(".") || tok.startsWith(",") || tok.startsWith("|") || tok.startsWith("\n") || tok.startsWith("(") || tok.startsWith(")"))
+                if(tok.startsWith(".") || tok.startsWith(",") || tok.startsWith("|")  || tok.startsWith("(") || tok.startsWith(")"))
                     tok = tok.substring(1, tok.length());
-                if(tok.endsWith(".") || tok.endsWith(",") || tok.endsWith("|") || tok.endsWith("\n")|| tok.endsWith("(") || tok.endsWith(")"))
+                if(tok.endsWith(".") || tok.endsWith(",") || tok.endsWith("|") || tok.endsWith("(") || tok.endsWith(")"))
                     tok = tok.substring(0, tok.length()-1);
-
-                //parsing for words
-                if(tok.matches("[A-Za-z]+")) {
-                    tok = stemmer.stem(tok);
-                    //------put here stop words and parse for words
-                }
 
                 //parsing for numbers, prises, percent
                 if(!tok.equals("") && (tok.charAt(0) == '$' || tok.charAt(tok.length()-1) == '$')) {
@@ -138,7 +132,7 @@ public class Parse {
                 else if(tok.length()>=2 && tok.charAt(tok.length()-2) == 'b' && tok.charAt(tok.length()-1) == 'n' && tok.substring(0, tok.length()-2).matches("\\d+\\.?\\d+?"))
                     tok = tok.replace("bn", "B");
 
-                if(tok.equals("U.S.") && i+1<tokens.length && tokens[i+1].equals("dollars")) {
+                if(tok.equals("U.S") && i+1<tokens.length && tokens[i+1].equals("dollars")) {
                     tok = "Dollars";
                     tokens[i+1] = "";
                 }
@@ -150,6 +144,12 @@ public class Parse {
 
                 if(isDollar)
                     tok = tok + " Dollars";
+
+                //parsing for words
+                if(tok.matches("[A-Za-z]+")) {
+                    tok = stemmer.stem(tok);
+                    //------put here stop words and parse for words
+                }
 
                 tokens[i] = tok;
                 terms.add(tok);
