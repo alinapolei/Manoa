@@ -5,7 +5,7 @@ public class Doc {
     private String docNumber;
     private String publishDate;
     private String header;
-    private   String headLine;
+    private  String headLine;
     private String bodyText;
 
     public Doc() {}
@@ -50,5 +50,6 @@ public class Doc {
         this.bodyText = bodyText;
     }
 
+    public String docToString(){return this.headLine+" "+this.bodyText;}
 
 }
