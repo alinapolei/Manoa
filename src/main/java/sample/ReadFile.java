@@ -82,7 +82,7 @@ public class ReadFile {
     }
 
     public void setStopWords(Set<String> stopWords) throws IOException {
-        File file=new File("C:\\Users\\alina\\Documents\\semester 5\\IR\\Stop_Words.txt");
+        File file=new File("C:\\Users\\Dror\\Desktop\\Stop_Words.txt");
         String []stopWordsArray =(String.join("\n", Files.readAllLines(file.toPath()))).split("\n");
         for (int i=0;i<stopWordsArray.length;i++)
             stopWords.add(stopWordsArray[i]);
