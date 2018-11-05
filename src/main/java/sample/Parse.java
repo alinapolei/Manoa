@@ -25,17 +25,32 @@ public class Parse {
                 String tok = tokens[i];
                 boolean isDollar = false;
 
-                //clean the token -> remove , . | \n from the start and the end
-                while ((!tok.matches("^\\w.*") || tok.startsWith("\n")) && !tok.equals(""))
+
+                while ((!tok.matches("^\\w.*") || tok.startsWith("\n")) && !tok.equals("") && !tok.startsWith("$") && !tok.startsWith("\""))
                     tok = tok.substring(1, tok.length());
-                while ((!tok.matches(".*\\w$") || tok.endsWith("\n")) && !tok.startsWith("%") && !tok.equals(""))
+                while ((!tok.matches(".*\\w$") || tok.endsWith("\n")) && !tok.endsWith("%") && !tok.endsWith("$") && !tok.equals("") && !tok.startsWith("\""))
                     tok = tok.substring(0, tok.length() - 1);
                 if (tok.equals("")) continue;
+
+                if(tok.startsWith("\"")){
+                    while(i<tokens.length && !tokens[i].endsWith("\"")){
+                        tok += (" " + tokens[i]);
+                        i++;
+                    }
+                }
 
                 //parsing for numbers, prises, percent
                 if (!tok.equals("") && (tok.charAt(0) == '$' || tok.charAt(tok.length() - 1) == '$')) {
                     tok = tok.replace("$", "");
+                    if(tok.matches("\\d{1,3}\\,\\d\\d\\d"))
+                        tok = tok + " Dollars";
+                    else
+                        isDollar = true;
+                }
+                if (i+3<tokens.length && tokens[i+2].equals("U.S.") && tokens[i + 3].equals("dollars")) {
                     isDollar = true;
+                    tokens[i + 2] = "";
+                    tokens[i + 3] = "";
                 }
 
                 if (tok.matches("[0-9]+\\.?[0-9]?+") && i + 1 < tokens.length && !tokens[i + 1].matches("[0-9]+\\/[0-9]+")) {
@@ -47,10 +62,16 @@ public class Parse {
                         tok = tok + "M";
                         tokens[i + 1] = "";
                     } else if (tokens[i + 1].toLowerCase().matches("billion")) {
-                        tok = tok + "B";
+                        if(isDollar)
+                            tok = tok + "000M";
+                        else
+                            tok = tok + "B";
                         tokens[i + 1] = "";
                     } else if (tokens[i + 1].toLowerCase().matches("trillion")) {
-                        tok = tok + "000B";
+                        if (isDollar)
+                            tok = tok + "000000M";
+                        else
+                            tok = tok + "000B";
                         tokens[i + 1] = "";
                     } else if (tokens[i + 1].matches("percent") || tokens[i + 1].matches("percentage")) {
                         tok = tok + "%";
@@ -123,12 +144,7 @@ public class Parse {
                 if (!tok.equals("") && tok.charAt(tok.length() - 1) == 'm' && tok.substring(0, tok.length() - 1).matches("\\d+\\.?\\d+?"))
                     tok = tok.replace('m', 'M');
                 else if (tok.length() >= 2 && tok.charAt(tok.length() - 2) == 'b' && tok.charAt(tok.length() - 1) == 'n' && tok.substring(0, tok.length() - 2).matches("\\d+\\.?\\d+?"))
-                    tok = tok.replace("bn", "B");
-
-                if (tok.equals("U.S") && i + 1 < tokens.length && tokens[i + 1].equals("dollars")) {
-                    tok = "Dollars";
-                    tokens[i + 1] = "";
-                }
+                    tok = tok.replace("bn", "") + "000M";
 
                 if (tok.equals("between") && i + 3 < tokens.length && tokens[i + 2].equals("and")) {
                     tok = tok + tokens[i + 1] + tokens[i + 2] + tokens[i + 3];
@@ -173,8 +189,8 @@ public class Parse {
                     terms.add(tok);
                 }
 
-           // String docc = String.join(" ", tokens);
-            //System.out.println(docc);
+            String docc = String.join(" ", tokens);
+            System.out.println(docc);
             docnumber++;
         }
         removeStopWords(terms,stopWords);
