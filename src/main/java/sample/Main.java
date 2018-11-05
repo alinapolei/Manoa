@@ -5,14 +5,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.util.Pair;
 
 
 import java.io.IOException;
 import java.util.*;
 
 
-import java.io.File;
 
 
 public class Main extends Application {
