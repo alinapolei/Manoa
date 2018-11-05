@@ -33,10 +33,13 @@ public class Parse {
                 if (tok.equals("")) continue;
 
                 if(tok.startsWith("\"")){
+                    i++;
                     while(i<tokens.length && !tokens[i].endsWith("\"")){
                         tok += (" " + tokens[i]);
                         i++;
                     }
+                    if(i < tokens.length)
+                        tok += tokens[i];
                 }
 
                 //parsing for numbers, prises, percent
@@ -185,12 +188,12 @@ public class Parse {
                     }
 
 
-                    tokens[i] = tok;
+                    //tokens[i] = tok;
                     terms.add(tok);
                 }
 
-            String docc = String.join(" ", tokens);
-            System.out.println(docc);
+            //String docc = String.join(" ", tokens);
+            //System.out.println(docc);
             docnumber++;
         }
         removeStopWords(terms,stopWords);
