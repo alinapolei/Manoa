@@ -8,7 +8,7 @@ import java.util.*;
 
 public class Parse {
     public Parse(HashSet<Doc> docs,Set <String> stopWords) { //docs is the documents after readFile separate them all
-        DateFormatSymbols dateFormatSymbols = new DateFormatSymbols(Locale.ENGLISH);
+        DateFormatSymbols dateFormatSymbols = new DateFormatSymbols(new Locale("en","US"));
         List<String> months = Arrays.asList(dateFormatSymbols.getMonths());
         months.replaceAll(String::toLowerCase);
         List<String> shortMonths = Arrays.asList(dateFormatSymbols.getShortMonths());
@@ -79,12 +79,12 @@ public class Parse {
                     } else if (tokens[i + 1].matches("percent") || tokens[i + 1].matches("percentage")) {
                         tok = tok + "%";
                         tokens[i + 1] = "";
-                    } else if (!tokens[i + 1].equals("") && (months.contains(tokens[i + 1].toLowerCase()) || shortMonths.contains(tokens[i + 1].toLowerCase()))) {
+                    } else if (tok.matches("[0-9]+")&&!tokens[i + 1].equals("") && (months.contains(tokens[i + 1].toLowerCase()) || shortMonths.contains(tokens[i + 1].toLowerCase()))) {
                         //14 May -> 05-14
                         try {
-                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd");
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd",Locale.ENGLISH);
                             Calendar date = new GregorianCalendar();
-                            date.set(Calendar.MONTH, new SimpleDateFormat("MMMM").parse(tokens[i + 1]).getMonth());
+                            date.set(Calendar.MONTH, new SimpleDateFormat("MMMM", Locale.ENGLISH).parse(tokens[i + 1]).getMonth());
                             date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tok));
                             tok = simpleDateFormat.format(date.getTime());
                             tokens[i + 1] = "";
@@ -130,13 +130,13 @@ public class Parse {
                     Calendar date = new GregorianCalendar();
                     if (tokens[i + 1].length() == 4) {//May 1994 -> 1994-05
                         date.set(Calendar.YEAR, Integer.parseInt(tokens[i + 1]));
-                        simpleDateFormat = new SimpleDateFormat("yyyy-MM");
+                        simpleDateFormat = new SimpleDateFormat("yyyy-MM",Locale.ENGLISH);
                     } else {//JUNE 4 -> 06-04
-                        simpleDateFormat = new SimpleDateFormat("MM-dd");
+                        simpleDateFormat = new SimpleDateFormat("MM-dd",Locale.ENGLISH);
                         date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tokens[i + 1]));
                     }
                     try {
-                        date.set(Calendar.MONTH, new SimpleDateFormat("MMMM").parse(tok).getMonth());
+                        date.set(Calendar.MONTH, new SimpleDateFormat("MMMM",Locale.ENGLISH).parse(tok).getMonth());
                         tok = simpleDateFormat.format(date.getTime());
                         tokens[i + 1] = "";
                     } catch (ParseException e) {
