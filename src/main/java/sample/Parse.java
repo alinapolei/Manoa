@@ -7,21 +7,30 @@ import java.util.*;
 
 
 public class Parse {
-    public Parse(HashSet<Doc> docs,Set <String> stopWords) { //docs is the documents after readFile separate them all
-        DateFormatSymbols dateFormatSymbols = new DateFormatSymbols(new Locale("en","US"));
-        List<String> months = Arrays.asList(dateFormatSymbols.getMonths());
+    DateFormatSymbols dateFormatSymbols;
+    List<String> months;
+    List<String> shortMonths;
+    Stemmer stemmer;
+    Set<String> terms;
+    public Parse() { //docs is the documents after readFile separate them all
+        dateFormatSymbols = new DateFormatSymbols(new Locale("en","US"));
+        months = Arrays.asList(dateFormatSymbols.getMonths());
         months.replaceAll(String::toLowerCase);
-        List<String> shortMonths = Arrays.asList(dateFormatSymbols.getShortMonths());
+        shortMonths = Arrays.asList(dateFormatSymbols.getShortMonths());
         shortMonths.replaceAll(String::toLowerCase);
-        Stemmer stemmer = new Stemmer();
-        Set<String> terms = new HashSet<>();
+        stemmer = new Stemmer();
+        terms = new HashSet<>();
 
 
+        System.out.println("done");
+    }
+
+    public void doParse(HashSet<Doc> docs){
         int docnumber=1;
-        for (Doc doc : docs){
-            System.out.println("Doc number: "+ docnumber);
-            String [] tokens = doc.docToString().split(" ");
-            for(int i=0; i<tokens.length; i++) {
+        for(Doc doc : docs) {
+            System.out.println("Doc number: " + docnumber);
+            String[] tokens = doc.docToString().split(" ");
+            for (int i = 0; i < tokens.length; i++) {
                 String tok = tokens[i];
                 boolean isDollar = false;
 
@@ -32,25 +41,25 @@ public class Parse {
                     tok = tok.substring(0, tok.length() - 1);
                 if (tok.equals("")) continue;
 
-                if(tok.startsWith("\"")){
+                if (tok.startsWith("\"")) {
                     i++;
-                    while(i<tokens.length && !tokens[i].endsWith("\"")){
+                    while (i < tokens.length && !tokens[i].endsWith("\"")) {
                         tok += (" " + tokens[i]);
                         i++;
                     }
-                    if(i < tokens.length)
+                    if (i < tokens.length)
                         tok += tokens[i];
                 }
 
                 //parsing for numbers, prises, percent
                 if (!tok.equals("") && (tok.charAt(0) == '$' || tok.charAt(tok.length() - 1) == '$')) {
                     tok = tok.replace("$", "");
-                    if(tok.matches("\\d{1,3}\\,\\d\\d\\d"))
+                    if (tok.matches("\\d{1,3}\\,\\d\\d\\d"))
                         tok = tok + " Dollars";
                     else
                         isDollar = true;
                 }
-                if (i+3<tokens.length && tokens[i+2].equals("U.S.") && tokens[i + 3].equals("dollars")) {
+                if (i + 3 < tokens.length && tokens[i + 2].equals("U.S.") && tokens[i + 3].equals("dollars")) {
                     isDollar = true;
                     tokens[i + 2] = "";
                     tokens[i + 3] = "";
@@ -65,7 +74,7 @@ public class Parse {
                         tok = tok + "M";
                         tokens[i + 1] = "";
                     } else if (tokens[i + 1].toLowerCase().matches("billion")) {
-                        if(isDollar)
+                        if (isDollar)
                             tok = tok + "000M";
                         else
                             tok = tok + "B";
@@ -79,10 +88,10 @@ public class Parse {
                     } else if (tokens[i + 1].matches("percent") || tokens[i + 1].matches("percentage")) {
                         tok = tok + "%";
                         tokens[i + 1] = "";
-                    } else if (tok.matches("[0-9]+")&&!tokens[i + 1].equals("") && (months.contains(tokens[i + 1].toLowerCase()) || shortMonths.contains(tokens[i + 1].toLowerCase()))) {
+                    } else if (tok.matches("[0-9]+") && !tokens[i + 1].equals("") && (months.contains(tokens[i + 1].toLowerCase()) || shortMonths.contains(tokens[i + 1].toLowerCase()))) {
                         //14 May -> 05-14
                         try {
-                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd",Locale.ENGLISH);
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd", Locale.ENGLISH);
                             Calendar date = new GregorianCalendar();
                             date.set(Calendar.MONTH, new SimpleDateFormat("MMMM", Locale.ENGLISH).parse(tokens[i + 1]).getMonth());
                             date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tok));
@@ -130,13 +139,13 @@ public class Parse {
                     Calendar date = new GregorianCalendar();
                     if (tokens[i + 1].length() == 4) {//May 1994 -> 1994-05
                         date.set(Calendar.YEAR, Integer.parseInt(tokens[i + 1]));
-                        simpleDateFormat = new SimpleDateFormat("yyyy-MM",Locale.ENGLISH);
+                        simpleDateFormat = new SimpleDateFormat("yyyy-MM", Locale.ENGLISH);
                     } else {//JUNE 4 -> 06-04
-                        simpleDateFormat = new SimpleDateFormat("MM-dd",Locale.ENGLISH);
+                        simpleDateFormat = new SimpleDateFormat("MM-dd", Locale.ENGLISH);
                         date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tokens[i + 1]));
                     }
                     try {
-                        date.set(Calendar.MONTH, new SimpleDateFormat("MMMM",Locale.ENGLISH).parse(tok).getMonth());
+                        date.set(Calendar.MONTH, new SimpleDateFormat("MMMM", Locale.ENGLISH).parse(tok).getMonth());
                         tok = simpleDateFormat.format(date.getTime());
                         tokens[i + 1] = "";
                     } catch (ParseException e) {
@@ -166,41 +175,37 @@ public class Parse {
                     if (tok.startsWith("\n"))
                         tok = tok.replace("\n", "");
                     String tmp = Character.toUpperCase(tok.toCharArray()[0]) + (tok.substring(1, tok.length()).toLowerCase());
-                        if (tok.equals(tok.toUpperCase())) {
-                            if (terms.contains(tok.toLowerCase()) || terms.contains(tmp)) {
-                                terms.remove(tok.toLowerCase());
-                                terms.remove(tmp);
-                                tok = (tok.toLowerCase());
-                            }
+                    if (tok.equals(tok.toUpperCase())) {
+                        if (terms.contains(tok.toLowerCase()) || terms.contains(tmp)) {
+                            terms.remove(tok.toLowerCase());
+                            terms.remove(tmp);
+                            tok = (tok.toLowerCase());
                         }
-                        else if (tok.equals(tok.toLowerCase())) {
-                            if (terms.contains(tok.toUpperCase()) || terms.contains(tmp)) {
-                                terms.remove(tok.toUpperCase());
-                                terms.remove(tmp);
-                                tok = (tok.toLowerCase());
-                            }
+                    } else if (tok.equals(tok.toLowerCase())) {
+                        if (terms.contains(tok.toUpperCase()) || terms.contains(tmp)) {
+                            terms.remove(tok.toUpperCase());
+                            terms.remove(tmp);
+                            tok = (tok.toLowerCase());
                         }
-                        else if (tok.equals(tmp))
-                                    if (terms.contains(tok.toUpperCase()) || terms.contains(tok.toLowerCase())) {
-                                        terms.remove(tok);
-                                        tok = (tok.toLowerCase());
-                                    }
-                    }
-
-
-                    //tokens[i] = tok;
-                    terms.add(tok);
+                    } else if (tok.equals(tmp))
+                        if (terms.contains(tok.toUpperCase()) || terms.contains(tok.toLowerCase())) {
+                            terms.remove(tok);
+                            tok = (tok.toLowerCase());
+                        }
                 }
+
+
+                //tokens[i] = tok;
+                terms.add(tok);
+            }
 
             //String docc = String.join(" ", tokens);
             //System.out.println(docc);
             docnumber++;
         }
-        removeStopWords(terms,stopWords);
-        System.out.println("done");
     }
 
-    private void removeStopWords(Set<String> terms, Set<String> stopWords) {
+    public void removeStopWords( Set<String> stopWords) {
             for (int i=0;i<stopWords.size();i++)
                 if(terms.contains(stopWords.toArray()[i]))
                     terms.remove(stopWords.toArray()[i]);

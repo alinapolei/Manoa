@@ -10,10 +10,12 @@ import java.nio.file.Files;
 import java.util.*;
 
 public class ReadFile {
+    public ReadFile() {
+    }
 
-    public ReadFile(String path, HashSet<Doc> hashSet,Set<String> stopWords) {
-        List<File> allFiles = new ArrayList<File>();
-        getAllFiles(path, allFiles);
+    /*public ReadFile(String path, HashSet<Doc> hashSet,Set<String> stopWords) {
+        //List<File> allFiles = new ArrayList<File>();
+        //getAllFiles(path, allFiles);
         separateDocuments(allFiles, hashSet);
         System.out.println("num of files" + allFiles.size());
         try {
@@ -22,25 +24,10 @@ public class ReadFile {
             e.printStackTrace();
         }
         //System.out.println(hashSet.size());
-    }
-
-    public void getAllFiles(String path, List<File> allFiles) {
-        File directory = new File(path);
-        File[] fileList = directory.listFiles();
-        if (fileList != null) {
-            for (File file : fileList) {
-                if (file.isFile())
-                    allFiles.add(file);
-                else if (file.isDirectory())
-                    getAllFiles(file.getAbsolutePath(), allFiles);
-            }
-        }
-    }
+    }*/
 
 
-    private void separateDocuments(List<File> allFiles, HashSet<Doc> hashSet) {
-
-        for (File file : allFiles) {
+    public void separateDocuments(File file, HashSet<Doc> hashSet) {
             try {
                 int i=0;
                 Document doc = Jsoup.parse(file, "utf-8");
@@ -64,8 +51,6 @@ public class ReadFile {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-        }
     }
 
     public void setDocParrameters(Doc temp,Element x,String dateTag,String headTag)
@@ -82,44 +67,9 @@ public class ReadFile {
     }
 
     public void setStopWords(Set<String> stopWords) throws IOException {
-            File file=new File("C:\\Users\\dror\\Desktop\\Stop_Words.txt");
+            File file=new File("C:\\Users\\alina\\Desktop\\Stop_Words.txt");
         String []stopWordsArray =(String.join("\n", Files.readAllLines(file.toPath()))).split("\n");
         for (int i=0;i<stopWordsArray.length;i++)
             stopWords.add(stopWordsArray[i]);
     }
-
-
-
-
-        /*int sumCounters = 0;
-        String line = "";
-        String content = "";
-        for (File file : allFiles){
-            int counter = 0;
-            int nlines = 0;
-            try {
-                Scanner input = new Scanner(new BufferedReader(new FileReader(file.getPath())));
-                while(input.hasNextLine()) {
-                    String str = input.findInLine("<DOC>");
-                    if(str != null){
-                        if(content != "") {
-                            hashSet.add(content);
-                            content = "";
-                        }
-                        counter++;
-                        content += "<DOC>\n";
-                    }
-                    content += line;
-                    line = input.nextLine();
-                    nlines++;
-                }
-                hashSet.add(content);
-                sumCounters+=counter;
-                System.out.println(file.getName()+" : "+counter);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-        System.out.println("sum docs:" + sumCounters);
-    }*/
 }

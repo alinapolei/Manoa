@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -21,31 +22,41 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-
+        List<File> allFiles = new ArrayList<File>();
+        getAllFiles("C:\\Users\\alina\\Documents\\semester 5\\IR\\corpus\\corpus", allFiles);
+        ReadFile readFile = new ReadFile();
+        readFile.setStopWords(stopWords);
+        Parse parse = new Parse();
         HashSet<Doc> docs = new HashSet<>();
-        ReadFile rf = new ReadFile("C:\\Users\\Dror\\Desktop\\corpus",docs,stopWords);
-        Parse parse=new Parse(docs,stopWords);
-        //HashSet<String> docs = new HashSet<>();
-        //File file = new File("C:\\Users\\Dror\\Desktop\\New.txt");
-        //Document doc = Jsoup.parse(file, "utf-8");
-        //Elements x=doc.getElementsByTag("date1");
-        //Doc t=new Doc();
-        //t.setPublishDate(doc.getElementsByTag("date1").text());
-        //t.setDocNumber(doc.getElementsByTag("DOCNO").text());
-        //int k=doc.getElementsByTag("text").text().indexOf("[Text]")+6;
-        //t.setBodyText(doc.getElementsByTag("text").text().substring(k));
 
+        for (File file : allFiles) {
+            readFile.separateDocuments(file, docs);
+            parse.doParse(docs);
+        }
+        parse.removeStopWords(stopWords);
 
-        //docs.add(String.join("\n", Files.readAllLines(file.toPath())));
-        //Parse parse = new Parse(docs);
+        /*HashSet<Doc> docs = new HashSet<>();
+        ReadFile rf = new ReadFile("C:\\Users\\alina\\Documents\\semester 5\\IR\\corpus\\corpus",docs, stopWords);
+        //ReadFile rf = new ReadFile("C:\\Users\\alina\\Desktop\\FB396150", docs, stopWords);
+        Parse parse = new Parse(docs, stopWords);*/
 
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Hello World");
         primaryStage.setScene(new Scene(root, 300, 275));
-        primaryStage.show();
     }
 
-
+    public void getAllFiles(String path, List<File> allFiles) {
+        File directory = new File(path);
+        File[] fileList = directory.listFiles();
+        if (fileList != null) {
+            for (File file : fileList) {
+                if (file.isFile())
+                    allFiles.add(file);
+                else if (file.isDirectory())
+                    getAllFiles(file.getAbsolutePath(), allFiles);
+            }
+        }
+    }
 
     public static void main(String[] args) throws IOException {
 
