@@ -8,7 +8,7 @@ import java.util.*;
 
 public class Parse {
     public Parse(HashSet<Doc> docs,Set <String> stopWords) { //docs is the documents after readFile separate them all
-        DateFormatSymbols dateFormatSymbols = new DateFormatSymbols();
+        DateFormatSymbols dateFormatSymbols = new DateFormatSymbols(Locale.ENGLISH);
         List<String> months = Arrays.asList(dateFormatSymbols.getMonths());
         months.replaceAll(String::toLowerCase);
         List<String> shortMonths = Arrays.asList(dateFormatSymbols.getShortMonths());
@@ -20,7 +20,7 @@ public class Parse {
         int docnumber=1;
         for (Doc doc : docs){
             System.out.println("Doc number: "+ docnumber);
-            String[] tokens = doc.docToString().split(" ");
+            String [] tokens = doc.docToString().split(" ");
             for(int i=0; i<tokens.length; i++) {
                 String tok = tokens[i];
                 boolean isDollar = false;

@@ -23,7 +23,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
 
         HashSet<Doc> docs = new HashSet<>();
-        ReadFile rf = new ReadFile("C:\\Users\\Dror\\Desktop\\corpus",docs,stopWords);
+        ReadFile rf = new ReadFile("C:\\Users\\Dror\\Desktop\\corpuss",docs,stopWords);
         Parse parse=new Parse(docs,stopWords);
         //HashSet<String> docs = new HashSet<>();
         //File file = new File("C:\\Users\\Dror\\Desktop\\New.txt");
