@@ -48,11 +48,11 @@ public class Parse {
                         i++;
                     }
                     if (i < tokens.length)
-                        tok += tokens[i];
+                        tok = tok + " " + tokens[i];
                 }
 
                 //parsing for numbers, prises, percent
-                if (!tok.equals("") && (tok.charAt(0) == '$' || tok.charAt(tok.length() - 1) == '$')) {
+                if (tok.endsWith("$") || tok.startsWith("$")) {
                     tok = tok.replace("$", "");
                     if (tok.matches("\\d{1,3}\\,\\d\\d\\d"))
                         tok = tok + " Dollars";
@@ -65,7 +65,7 @@ public class Parse {
                     tokens[i + 3] = "";
                 }
 
-                if (tok.matches("[0-9]+\\.?[0-9]?+") && i + 1 < tokens.length && !tokens[i + 1].matches("[0-9]+\\/[0-9]+")) {
+                if ((tok.matches("[0-9]+") || tok.matches("[0-9]+\\.[0-9]+")) && i + 1 < tokens.length) {
                     //number + Thousand/Million/Billion/Trillion
                     if (tokens[i + 1].toLowerCase().matches("thousand")) {
                         tok = tok + "K";
@@ -88,6 +88,16 @@ public class Parse {
                     } else if (tokens[i + 1].matches("percent") || tokens[i + 1].matches("percentage")) {
                         tok = tok + "%";
                         tokens[i + 1] = "";
+                    }else if(tokens[i+1].matches("[1-9]+\\/[1-9]+")){
+                        tok = tok + " " + tokens[i+1];
+                        tokens[i+1] = "";
+                        if(i+2<tokens.length && tokens[i+2].equals("Dollars")){
+                            tok = tok + " Dollars";
+                            tokens[i+2] = "";
+                        }
+                    }else if(tokens[i+1].equals("Dollars")){
+                        tok = tok + " Dollars";
+                        tokens[i+1] = "";
                     } else if (tok.matches("[0-9]+") && !tokens[i + 1].equals("") && (months.contains(tokens[i + 1].toLowerCase()) || shortMonths.contains(tokens[i + 1].toLowerCase()))) {
                         //14 May -> 05-14
                         try {
@@ -114,6 +124,10 @@ public class Parse {
                     parts[1] = parts[1].replaceAll("0*$", "");
                     parts[2] = parts[2].replaceAll("0*$", "");
                     tok = parts[0] + (!parts[1].equals("") ? "." + parts[1] : parts[1]) + parts[2] + "M";
+                    if(tokens[i+1].equals("Dollars")){
+                        tok = tok + " Dollars";
+                        tokens[i+1] = "";
+                    }
                 } else if (tok.matches("\\d{1,3}\\,\\d\\d\\d\\,\\d\\d\\d\\,\\d\\d\\d")) {
                     //10,123,000 ->10.123M
                     String[] parts = tok.split(",");
@@ -153,10 +167,18 @@ public class Parse {
                     }
                 }
 
-                if (!tok.equals("") && tok.charAt(tok.length() - 1) == 'm' && tok.substring(0, tok.length() - 1).matches("\\d+\\.?\\d+?"))
-                    tok = tok.replace('m', 'M');
-                else if (tok.length() >= 2 && tok.charAt(tok.length() - 2) == 'b' && tok.charAt(tok.length() - 1) == 'n' && tok.substring(0, tok.length() - 2).matches("\\d+\\.?\\d+?"))
-                    tok = tok.replace("bn", "") + "000M";
+                if(i+1<tokens.length && tokens[i+1].equals("Dollars")) {
+                    if (tok.endsWith("m") && tok.substring(0, tok.length() - 1).matches("\\d+\\.?\\d+?")) {
+                        tok = tok.replace('m', 'M');
+                        tok = tok + " Dollars";
+                        tokens[i + 1] = "";
+                    }
+                    else if (tok.endsWith("bn") && tok.substring(0, tok.length() - 2).matches("\\d+\\.?\\d+?")) {
+                        tok = tok.replace("bn", "") + "000M";
+                        tok = tok + " Dollars";
+                        tokens[i + 1] = "";
+                    }
+                }
 
                 if (tok.equals("between") && i + 3 < tokens.length && tokens[i + 2].equals("and")) {
                     tok = tok + tokens[i + 1] + tokens[i + 2] + tokens[i + 3];
@@ -211,3 +233,5 @@ public class Parse {
                     terms.remove(stopWords.toArray()[i]);
     }
 }
+
+
