@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 
+import java.io.Console;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -23,15 +24,17 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         List<File> allFiles = new ArrayList<File>();
-        getAllFiles("C:\\Users\\alina\\Documents\\semester 5\\IR\\corpus\\corpus", allFiles);
+        getAllFiles("C:\\Users\\Dror\\Desktop\\corpuss", allFiles);
         ReadFile readFile = new ReadFile();
         readFile.setStopWords(stopWords);
         Parse parse = new Parse();
         HashSet<Doc> docs = new HashSet<>();
-
+        int numFile=1;
         for (File file : allFiles) {
+            System.out.println("Number of File :  "+numFile);
             readFile.separateDocuments(file, docs);
             parse.doParse(docs);
+            numFile++;
         }
         parse.removeStopWords(stopWords);
 
