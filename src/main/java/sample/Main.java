@@ -29,12 +29,16 @@ public class Main extends Application {
         Parse parse = new Parse();
         HashSet<Doc> docs = new HashSet<>();
 
+
+        long start = System.nanoTime();
         for (File file : allFiles) {
             readFile.separateDocuments(file, docs);
+            long start1 = System.nanoTime();
             parse.doParse(docs);
+            System.out.println("parse file: " +(System.nanoTime()-start1)*Math.pow(10, -9));
         }
         parse.removeStopWords(stopWords);
-
+        System.out.println("sum: "+(System.nanoTime()-start)*Math.pow(10, -9));
         /*HashSet<Doc> docs = new HashSet<>();
         ReadFile rf = new ReadFile("C:\\Users\\alina\\Documents\\semester 5\\IR\\corpus\\corpus",docs, stopWords);
         //ReadFile rf = new ReadFile("C:\\Users\\alina\\Desktop\\FB396150", docs, stopWords);
@@ -43,6 +47,7 @@ public class Main extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Hello World");
         primaryStage.setScene(new Scene(root, 300, 275));
+        primaryStage.show();
     }
 
     public void getAllFiles(String path, List<File> allFiles) {
