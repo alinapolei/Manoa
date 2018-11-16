@@ -45,7 +45,7 @@ public class ReadFile {
 
 
                     hashSet.add(temp);
-                    System.out.println(hashSet.size());
+                    //System.out.println(hashSet.size());
                 }
 
             } catch (IOException e) {
