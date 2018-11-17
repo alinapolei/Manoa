@@ -54,8 +54,7 @@ public class Parse {
                         if (i < tokens.length)
                             tok = tok + " " + tokens[i];
                     }
-                    else
-                        tok.replace("\"", "");
+                    tok = tok.replace("\"", "");
                 } else if (tok.contains("-")) {
                     terms.add(tok);
                     continue;
