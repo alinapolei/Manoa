@@ -42,6 +42,8 @@ public class Parse {
                     tok = tok.substring(0, tok.length() - 1);
                 if (tok.equals("")) continue;
 
+                if(tok.equals("") || tok.equals(" ") || tok.equals("+"))
+                    System.out.println("boom");
 
                 if (tok.startsWith("\"")) {
                     tok = tok.replaceFirst("\"", "");
@@ -55,6 +57,7 @@ public class Parse {
                             tok = tok + " " + tokens[i];
                     }
                     tok = tok.replace("\"", "");
+                    if (tok.equals("") || tok.equals(" ")) continue;
                 } else if (tok.contains("-")) {
                     terms.add(tok);
                     continue;
@@ -256,6 +259,8 @@ public class Parse {
                 }
 
                 //tokens[i] = tok;
+                if(tok.equals("") || tok.equals(" ") || tok.equals("-") || tok.equals("*"))
+                    System.out.println("boom");
                 terms.add(tok);
             }
 
