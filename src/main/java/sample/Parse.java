@@ -25,11 +25,6 @@ public class Parse {
         stemmer = new Stemmer();
         terms = new HashSet<>();
         mixterms=new HashSet<>();upCharterms=new HashSet<>();lowCharterms=new HashSet();
-
-
-
-
-
         //System.out.println("done");
     }
 
@@ -49,51 +44,49 @@ public class Parse {
 
 
                 if (tok.startsWith("\"")) {
-                    i++;
-                    while (i < tokens.length && !tokens[i].endsWith("\"")) {
-                        tok += (" " + tokens[i]);
+                    tok = tok.replaceFirst("\"", "");
+                    if(!tok.endsWith("\"")) {
                         i++;
+                        while (i < tokens.length && !tokens[i].endsWith("\"")) {
+                            tok += (" " + tokens[i]);
+                            i++;
+                        }
+                        if (i < tokens.length)
+                            tok = tok + " " + tokens[i];
                     }
-                    if (i < tokens.length)
-                        tok = tok + " " + tokens[i];
-
+                    else
+                        tok.replace("\"", "");
                 } else if (tok.contains("-")) {
                     terms.add(tok);
-
                     continue;
                 }
-
-
                 else{
                     if(isAlpha(tok)){
-
                         //------put here stop words and parse for words
-                        //if (tok.startsWith("\n"))
-                        //    tok = tok.replace("\n", "");
                         if (tok.equals("between") && i + 3 < tokens.length && tokens[i + 2].equals("and")) {
                             tok = tok + tokens[i + 1] + tokens[i + 2] + tokens[i + 3];
                             tokens[i + 1] = "";
                             tokens[i + 2] = "";
                             tokens[i + 3] = "";
-
                         }
-                        else if (!tok.equals("") && i + 1 < tokens.length && !tokens[i + 1].equals("") && StringUtil.isNumeric(tokens[i + 1])) {
-
-                            if(months.contains(tok.toLowerCase())){
-                                if (tokens[i + 1].length() == 4) //May 1994 -> 1994-05
-                                    tok = tokens[i+1]+"-"+(months.indexOf(tok)+1);
-                                else //JUNE 4 -> 06-04
-                                    tok = (months.indexOf(tok)+1)+"-"+tokens[i+1];
-                                tokens[i + 1] = "";
+                        else if (!tok.equals("") && i + 1 < tokens.length && !tokens[i + 1].equals("") && StringUtil.isNumeric(tokens[i + 1])
+                        && (months.contains(tok.toLowerCase()) || shortMonths.contains(tok.toLowerCase()))) {
+                            SimpleDateFormat simpleDateFormat;
+                            Calendar date = new GregorianCalendar();
+                            if (tokens[i + 1].length() == 4) {//May 1994 -> 1994-05
+                                date.set(Calendar.YEAR, Integer.parseInt(tokens[i + 1]));
+                                simpleDateFormat = new SimpleDateFormat("yyyy-MM", Locale.ENGLISH);
+                            } else {//JUNE 4 -> 06-04
+                                simpleDateFormat = new SimpleDateFormat("MM-dd", Locale.ENGLISH);
+                                date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tokens[i + 1]));
                             }
-                            else if (shortMonths.contains(tok.toLowerCase())){
-                                if (tokens[i + 1].length() == 4) //May 1994 -> 1994-05
-                                    tok = tokens[i+1]+"-"+(shortMonths.indexOf(tok)+1);
-                                else //JUNE 4 -> 06-04
-                                    tok = (shortMonths.indexOf(tok)+1)+"-"+tokens[i+1];
+                            try {
+                                date.set(Calendar.MONTH, new SimpleDateFormat("MMMM", Locale.ENGLISH).parse(tok).getMonth());
+                                tok = simpleDateFormat.format(date.getTime());
                                 tokens[i + 1] = "";
+                            } catch (ParseException e) {
+                                e.printStackTrace();
                             }
-
                         }
                         else {
 
@@ -178,15 +171,17 @@ public class Parse {
                                 } else if (tokens[i + 1].equals("Dollars")) {
                                     tok = tok + " Dollars";
                                     tokens[i + 1] = "";
-                                } else if (isNum && !tokens[i + 1].equals("") ) {
+                                } else if (isNum && !tokens[i + 1].equals("") && (months.contains(tokens[i + 1].toLowerCase()) || shortMonths.contains(tokens[i + 1].toLowerCase()))) {
                                     //14 May -> 05-14
-                                    if(months.contains(tok.toLowerCase())){
-                                        tok = (months.indexOf(tokens[i+1])+1)+"-"+tok;
+                                    try {
+                                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd", Locale.ENGLISH);
+                                        Calendar date = new GregorianCalendar();
+                                        date.set(Calendar.MONTH, new SimpleDateFormat("MMMM", Locale.ENGLISH).parse(tokens[i + 1]).getMonth());
+                                        date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tok));
+                                        tok = simpleDateFormat.format(date.getTime());
                                         tokens[i + 1] = "";
-                                    }
-                                    else if (shortMonths.contains(tok.toLowerCase())){
-                                        tok = (shortMonths.indexOf(tokens[i+1])+1)+"-"+tok;
-                                        tokens[i + 1] = "";
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
                                     }
                                 }
                             }
@@ -204,19 +199,24 @@ public class Parse {
 
                             }
                         }
-
                         else{
-
                             if (tok.matches("\\d{1,3}\\,\\d\\d\\d")) {
-                                //10,123 ->10.123K
-                                String[] parts = tok.split(",");
-                                parts[1] = parts[1].replaceAll("0*$", "");
-                                tok = parts[0] + (!parts[1].equals("") ? "." + parts[1] : parts[1]) + "K";
+                                if (i+1<tokens.length && tokens[i + 1].equals("Dollars")) {
+                                    tok = tok + " Dollars";
+                                    tokens[i + 1] = "";
+                                }
+                                else {
+                                    //10,123 ->10.123K
+                                    String[] parts = tok.split(",");
+                                    parts[1] = parts[1].replaceAll("0*$", "");
+                                    tok = parts[0] + (!parts[1].equals("") ? "." + parts[1] : parts[1]) + "K";
+                                }
                             } else if (tok.matches("\\d{1,3}\\,\\d\\d\\d\\,\\d\\d\\d")) {
                                 //10,123,000 ->10.123M
                                 String[] parts = tok.split(",");
-                                parts[1] = parts[1].replaceAll("0*$", "");
                                 parts[2] = parts[2].replaceAll("0*$", "");
+                                if(parts[2].equals(""))
+                                    parts[1] = parts[1].replaceAll("0*$", "");
                                 tok = parts[0] + (!parts[1].equals("") ? "." + parts[1] : parts[1]) + parts[2] + "M";
                                 if(i+1<tokens.length && tokens[i+1].equals("Dollars")){
                                     tok = tok + " Dollars";
@@ -225,21 +225,24 @@ public class Parse {
                             } else if (tok.matches("\\d{1,3}\\,\\d\\d\\d\\,\\d\\d\\d\\,\\d\\d\\d")) {
                                 //10,123,000 ->10.123M
                                 String[] parts = tok.split(",");
-                                parts[1] = parts[1].replaceAll("0*$", "");
-                                parts[2] = parts[2].replaceAll("0*$", "");
                                 parts[3] = parts[3].replaceAll("0*$", "");
+                                if(parts[3].equals("")) {
+                                    parts[2] = parts[2].replaceAll("0*$", "");
+                                    if(parts[2].equals(""))
+                                        parts[1] = parts[1].replaceAll("0*$", "");
+                                }
                                 tok = parts[0] + (!parts[1].equals("") ? "." + parts[1] : parts[1]) + parts[2] + parts[3] + "B";
                             }
 
                         }
 
                         if(i+1<tokens.length && tokens[i+1].equals("Dollars")) {
-                            if (tok.endsWith("m") && tok.substring(0, tok.length() - 1).matches("\\d+\\.?\\d+?")) {
+                            if (tok.endsWith("m") && tok.substring(0, tok.length() - 1).matches("\\d+\\.?\\d?+")) {
                                 tok = tok.replace('m', 'M');
                                 tok = tok + " Dollars";
                                 tokens[i + 1] = "";
                             }
-                            else if (tok.endsWith("bn") && tok.substring(0, tok.length() - 2).matches("\\d+\\.?\\d+?")) {
+                            else if (tok.endsWith("bn") && tok.substring(0, tok.length() - 2).matches("\\d+\\.?\\d?+")) {
                                 tok = tok.replace("bn", "") + "000M";
                                 tok = tok + " Dollars";
                                 tokens[i + 1] = "";
