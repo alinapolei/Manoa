@@ -1,4 +1,5 @@
 package sample;
+import javafx.util.Pair;
 import org.jsoup.helper.StringUtil;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
@@ -16,6 +17,7 @@ public class Parse {
     HashSet<String> upCharterms;
     HashSet<String> mixterms;
     String[] tokens;
+
     public Parse() { //docs is the documents after readFile separate them all
         dateFormatSymbols = new DateFormatSymbols(new Locale("en","US"));
         months = Arrays.asList(dateFormatSymbols.getMonths());
