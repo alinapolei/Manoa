@@ -22,8 +22,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        List<File> allFiles = new ArrayList<File>();
-        getAllFiles("C:\\Users\\dror\\Desktop\\corpuss", allFiles);
+       /* List<File> allFiles = new ArrayList<File>();
+        getAllFiles("C:\\Users\\alina\\Documents\\semester 5\\IR\\corpus\\corpus", allFiles);
         ReadFile readFile = new ReadFile();
         readFile.setStopWords(stopWords);
         Parse parse = new Parse();
@@ -47,7 +47,7 @@ public class Main extends Application {
         Parse parse = new Parse(docs, stopWords);*/
 
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        primaryStage.setTitle("Hello World");
+        primaryStage.setTitle("My Manoa");
         primaryStage.setScene(new Scene(root, 300, 275));
         primaryStage.show();
     }
