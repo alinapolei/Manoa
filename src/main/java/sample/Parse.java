@@ -1,6 +1,6 @@
 package sample;
-import javafx.util.Pair;
 import org.jsoup.helper.StringUtil;
+import java.io.IOException;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,27 +12,25 @@ public class Parse {
     List<String> months;
     List<String> shortMonths;
     Stemmer stemmer;
-    HashSet<String> terms;
-    HashSet<String> lowCharterms;
-    HashSet<String> upCharterms;
-    HashSet<String> mixterms;
+    //Indexer index;
+    Conditions con=new Conditions();
     String[] tokens;
+    HashSet<Doc> docs;
+    public Parse() {
+        //docs is the documents after readFile separate them all
+        //index =new Indexer();
+    }
 
-    public Parse() { //docs is the documents after readFile separate them all
+    public void doParse(HashSet<Doc> dc){
+        docs=dc;
         dateFormatSymbols = new DateFormatSymbols(new Locale("en","US"));
         months = Arrays.asList(dateFormatSymbols.getMonths());
         months.replaceAll(String::toLowerCase);
         shortMonths = Arrays.asList(dateFormatSymbols.getShortMonths());
         shortMonths.replaceAll(String::toLowerCase);
         stemmer = new Stemmer();
-        terms = new HashSet<>();
-        mixterms=new HashSet<>();upCharterms=new HashSet<>();lowCharterms=new HashSet();
-        //System.out.println("done");
-    }
-
-    public void doParse(HashSet<Doc> docs){
-        for(Doc doc : docs) {
-            tokens= doc.docToString().split(" ");
+            for(Doc doc : docs) {
+                tokens= doc.docToString().split(" ");
             for (int i = 0; i < tokens.length; i++) {
                 String tok = tokens[i];
                 boolean isDollar = false;
@@ -61,11 +59,12 @@ public class Parse {
                     tok = tok.replace("\"", "");
                     if (tok.equals("") || tok.equals(" ")) continue;
                 } else if (tok.contains("-")) {
-                    terms.add(tok);
+                    Main.indexer.setDic(tok,doc);
+                    //terms.add(tok);
                     continue;
                 }
                 else{
-                    if(isAlpha(tok)){
+                    if(con.isAlpha(tok)){
                         //------put here stop words and parse for words
                         if (tok.equals("between") && i + 3 < tokens.length && tokens[i + 2].equals("and")) {
                             tok = tok + tokens[i + 1] + tokens[i + 2] + tokens[i + 3];
@@ -97,11 +96,14 @@ public class Parse {
                             tok = stemmer.stem(tok);
                             String tmp = Character.toUpperCase(tok.toCharArray()[0]) + (tok.substring(1).toLowerCase());
                             if (tok.equals(tmp))
-                                mixterms.add(tmp);
+                                Main.indexer.setMixedTerms(tok,doc);
+                                //mixterms.add(tmp);
                             else if (tok.equals(tok.toLowerCase()))
-                                lowCharterms.add(tok);
+                                Main.indexer.setLowerTerms(tok,doc);
+                                //lowCharterms.add(tok);
                             else
-                                upCharterms.add(tok);
+                                Main.indexer.setUpperTerms(tok,doc);
+                            //upCharterms.add(tok);
 
                             continue;
                         }
@@ -140,7 +142,7 @@ public class Parse {
                             tokens[i + 3] = "";
                         }
                         boolean isNumWithDot = tok.matches("[0-9]+\\.[0-9]+");
-                        boolean isNum = isNum(tok);
+                        boolean isNum = con.isNum(tok);
                         if ((isNum || isNumWithDot)) {
                             if(i + 1 < tokens.length) {
                                 //number + Thousand/Million/Billion/Trillion
@@ -263,30 +265,28 @@ public class Parse {
                 //tokens[i] = tok;
                 if(tok.equals("") || tok.equals(" ") || tok.equals("-") || tok.equals("*"))
                     System.out.println("boom");
-                terms.add(tok);
+                Main.indexer.setDic(tok,doc);
+                //terms.add(tok);
             }
 
             //String docc = String.join(" ", tokens);
             //System.out.println(docc);
             //docnumber++;
         }
+
+   }
+
+   public void transferDisk() throws IOException {
+       Main.indexer.transferToDisk();
    }
 
     public void removeStopWords( Set<String> stopWords) {
         for (int i=0;i<stopWords.size();i++)
-            if(terms.contains(stopWords.toArray()[i]))
-                terms.remove(stopWords.toArray()[i]);
+            if( Main.indexer.getDic().containsKey((stopWords.toArray()[i])))
+                Main.indexer.getDic().remove(stopWords.toArray()[i]);
     }
+}
 
-    private boolean isAlpha(String name) {
-
-        char[] chars = name.toCharArray();
-        for (char c : chars) {
-            if(!Character.isLetter(c)) {
-                return false;
-            }
-        }
-        return true;
 
 /*
         if(name.contains("[0-9]"))
@@ -294,23 +294,8 @@ public class Parse {
                 return true;
        return false;
 */
-    }
-    private boolean isNum(String name) {
 
-        char[] chars = name.toCharArray();
-        for (char c : chars) {
-            if(!Character.isDigit(c)) {
-                return false;
-            }
-        }
-        return true;
-
-        /*if(!name.contains("[a-zA-Z]"))
-            if(!    name.contains(("[$&+,:;=?@#|'<>.-^*()%!]")))
-                return true;
-        return false;*/
-    }
-
+/*
     public void setAllTerms(){
         Iterator<String> iter = mixterms.iterator();
         while (iter.hasNext()) {
@@ -345,8 +330,8 @@ public class Parse {
         terms.addAll(lowCharterms);
 
     }
+*/
 
-}
 
 
 

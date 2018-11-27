@@ -10,45 +10,56 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-
-
-
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class Main extends Application {
 
 
     public Set<String> stopWords = new HashSet<>();
-
+    public static Indexer indexer;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-       /* List<File> allFiles = new ArrayList<File>();
-        getAllFiles("C:\\Users\\alina\\Documents\\semester 5\\IR\\corpus\\corpus", allFiles);
+
+        List<File> allFiles = new ArrayList<File>();
+        getAllFiles("C:\\Users\\Dror\\Desktop\\corpus", allFiles);
         ReadFile readFile = new ReadFile();
         readFile.setStopWords(stopWords);
-        Parse parse = new Parse();
-        HashSet<Doc> docs = new HashSet<>();
-
-
+        indexer=new Indexer();
+        //Parse parse = new Parse(index);
+        //HashSet<Doc> docs = new HashSet<>();
         long start = System.nanoTime();
+        Parse parse = new Parse();
         for (File file : allFiles) {
-            docs.clear();
-            readFile.separateDocuments(file, docs);
-            System.out.println(file.getName());
-            parse.doParse(docs);
+              // docs.clear();
+                System.out.println(file.getName());
+                System.out.println("[+] start");
+            //readFile.separateDocuments(file, docs);
+            new Thread(){
+                   public void run(){
+                       HashSet<Doc> docs = new HashSet<>();
+                       Parse parse = new Parse();
+                       readFile.separateDocuments(file, docs);
+                       parse.doParse(docs);
+                       System.out.println("[+] doneParse" );
+                       docs.clear();
+                   }
+               }.start();
+
+
+            // parse.doParse(docs);
             //System.out.println("parse file: " +(System.nanoTime()-start1)*Math.pow(10, -9));
+
         }
-        parse.setAllTerms();
-        parse.removeStopWords(stopWords);
+        //parse.setAllTerms();
+       // parse.removeStopWords(stopWords);
+       // parse.transferDisk();
         System.out.println("sum: "+(System.nanoTime()-start)*Math.pow(10, -9));
-        /*HashSet<Doc> docs = new HashSet<>();
-        ReadFile rf = new ReadFile("C:\\Users\\alina\\Documents\\semester 5\\IR\\corpus\\corpus",docs, stopWords);
-        //ReadFile rf = new ReadFile("C:\\Users\\alina\\Desktop\\FB396150", docs, stopWords);
-        Parse parse = new Parse(docs, stopWords);*/
 
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("My Manoa");
         primaryStage.setScene(new Scene(root, 300, 275));
+//        System.out.println("here");
         primaryStage.show();
     }
 
