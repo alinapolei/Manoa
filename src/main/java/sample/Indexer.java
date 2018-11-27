@@ -2,27 +2,23 @@ package sample;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
+import java.util.*;
 
 
 public class Indexer {
 
-
-    private HashMap <String,DicEntry> dic;
-    private HashMap <String,DicEntry> lowTerms;
-    private HashMap <String,DicEntry> upTerms;
-    private HashMap <String,DicEntry> mixTerms;
-    private HashMap <String, LinkedList <PostEntry>> tmpPosting;
+    private Map<String,DicEntry> dic;
+    private Map <String,DicEntry> lowTerms;
+    private Map <String,DicEntry> upTerms;
+    private Map <String,DicEntry> mixTerms;
+    private Map <String, LinkedList <PostEntry>> tmpPosting;
     Conditions con=new Conditions();
     public Indexer() {
-        dic=new HashMap<>();
-        lowTerms=new HashMap<>();
-        upTerms=new HashMap<>();
-        mixTerms=new HashMap<>();
-        tmpPosting=new HashMap<>();
+        dic=Collections.synchronizedMap(new HashMap<>());
+        lowTerms=Collections.synchronizedMap(new HashMap<>());
+        upTerms=Collections.synchronizedMap(new HashMap<>());
+        mixTerms=Collections.synchronizedMap(new HashMap<>());
+        tmpPosting=Collections.synchronizedMap(new HashMap<>());
     }
 
     public void setDic(String term,Doc doc) {
@@ -70,7 +66,7 @@ public class Indexer {
         }
     }
 
-    private void newTerm(String term, Doc doc, HashMap<String, DicEntry> lowTerms) {
+    private void newTerm(String term, Doc doc, Map<String, DicEntry> lowTerms) {
         DicEntry dicEntry=new DicEntry(term);
         PostEntry post =new PostEntry(doc.getDocNumber());
         lowTerms.put(term, dicEntry);
@@ -87,31 +83,33 @@ public class Indexer {
            }
     }
 
-    public HashMap<String, DicEntry> getDic() {
+    public Map<String, DicEntry> getDic() {
         return dic;
     }
 
     private int conInPosting(String docNumber, String term) {
         int i=0;
-    for (PostEntry post : tmpPosting.get(term)) {
-        if (post.getDocNumber().equals(docNumber))
-            return i;
-        i++;
-    }
+        synchronized (tmpPosting) {
+            for (PostEntry post : tmpPosting.get(term)) {
+                if (post.getDocNumber().equals(docNumber))
+                    return i;
+                i++;
+            }
+        }
     return -1;
 }
 
 
-    public void transferToDisk() throws IOException {
+    public synchronized void transferToDisk() throws IOException {
         LinkedList<PostEntry> list;
         File file;
         for (String term : tmpPosting.keySet())
         {
             list=tmpPosting.get(term);
             if(con.isAlpha(term))
-                file =new File ("C:\\Users\\Dror\\Desktop\\Posting\\"+term.substring(0,1).toUpperCase()+".txt");
+                file =new File ("C:\\Users\\alina\\Desktop\\Posting\\"+term.substring(0,1).toUpperCase()+".txt");
             else
-                file =new File ("C:\\Users\\Dror\\Desktop\\Posting\\"+"Numbers"+".txt");
+                file =new File ("C:\\Users\\alina\\Desktop\\Posting\\"+"Numbers"+".txt");
                 FileWriter outFile = new FileWriter(file,true);
             for(PostEntry post: list)
                 try {

@@ -10,6 +10,8 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class Main extends Application {
@@ -22,29 +24,32 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
 
         List<File> allFiles = new ArrayList<File>();
-        getAllFiles("C:\\Users\\Dror\\Desktop\\corpus", allFiles);
+        getAllFiles("C:\\\\Users\\\\alina\\\\Documents\\\\semester 5\\\\IR\\\\corpus\\\\corpus", allFiles);
         ReadFile readFile = new ReadFile();
         readFile.setStopWords(stopWords);
         indexer=new Indexer();
+        ExecutorService executor = Executors.newFixedThreadPool(5);
+        //pool.
         //Parse parse = new Parse(index);
         //HashSet<Doc> docs = new HashSet<>();
         long start = System.nanoTime();
         Parse parse = new Parse();
         for (File file : allFiles) {
-              // docs.clear();
-                System.out.println(file.getName());
-                System.out.println("[+] start");
+            // docs.clear();
+            //System.out.println(file.getName());
+            //System.out.println("[+] start");
             //readFile.separateDocuments(file, docs);
+            executor.execute(
             new Thread(){
                    public void run(){
                        HashSet<Doc> docs = new HashSet<>();
                        Parse parse = new Parse();
                        readFile.separateDocuments(file, docs);
                        parse.doParse(docs);
-                       System.out.println("[+] doneParse" );
+                       System.out.println("[+] doneParse" + file.getName());
                        docs.clear();
                    }
-               }.start();
+               });
 
 
             // parse.doParse(docs);
@@ -54,6 +59,9 @@ public class Main extends Application {
         //parse.setAllTerms();
        // parse.removeStopWords(stopWords);
        // parse.transferDisk();
+        while (!executor.isTerminated()) {
+        }
+        executor.shutdown();
         System.out.println("sum: "+(System.nanoTime()-start)*Math.pow(10, -9));
 
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
