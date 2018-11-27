@@ -29,17 +29,15 @@ public class Main extends Application {
         readFile.setStopWords(stopWords);
         indexer=new Indexer();
         ExecutorService executor = Executors.newFixedThreadPool(5);
-        //pool.
         //Parse parse = new Parse(index);
         //HashSet<Doc> docs = new HashSet<>();
         long start = System.nanoTime();
-        Parse parse = new Parse();
         for (File file : allFiles) {
             // docs.clear();
             //System.out.println(file.getName());
             //System.out.println("[+] start");
             //readFile.separateDocuments(file, docs);
-            executor.execute(
+            /*executor.execute(
             new Thread(){
                    public void run(){
                        HashSet<Doc> docs = new HashSet<>();
@@ -50,7 +48,15 @@ public class Main extends Application {
                        docs.clear();
                    }
                });
-
+*/
+            long start1 = System.nanoTime();
+            HashSet<Doc> docs = new HashSet<>();
+            Parse parse = new Parse();
+            readFile.separateDocuments(file, docs);
+            parse.doParse(docs);
+            System.out.println("[+] doneParse" + file.getName());
+            docs.clear();
+            System.out.println("sum: "+(System.nanoTime()-start1)*Math.pow(10, -9));
 
             // parse.doParse(docs);
             //System.out.println("parse file: " +(System.nanoTime()-start1)*Math.pow(10, -9));
@@ -59,9 +65,9 @@ public class Main extends Application {
         //parse.setAllTerms();
        // parse.removeStopWords(stopWords);
        // parse.transferDisk();
+        /*executor.shutdown();
         while (!executor.isTerminated()) {
-        }
-        executor.shutdown();
+        }*/
         System.out.println("sum: "+(System.nanoTime()-start)*Math.pow(10, -9));
 
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));

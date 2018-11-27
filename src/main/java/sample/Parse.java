@@ -277,7 +277,7 @@ public class Parse {
    }
 
    public void transferDisk() throws IOException {
-       Main.indexer.transferToDisk();
+       //Main.indexer.transferToDisk();
    }
 
     public void removeStopWords( Set<String> stopWords) {
