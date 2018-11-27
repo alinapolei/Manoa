@@ -29,10 +29,16 @@ public class Main extends Application {
         readFile.setStopWords(stopWords);
         indexer=new Indexer();
         ExecutorService executor = Executors.newFixedThreadPool(5);
-        //Parse parse = new Parse(index);
+        Parse parse = new Parse();
         //HashSet<Doc> docs = new HashSet<>();
         long start = System.nanoTime();
+        int counter = 0;
         for (File file : allFiles) {
+            counter++;
+            if(counter == 200) {
+                parse.transferDisk();
+                counter = 0;
+            }
             // docs.clear();
             //System.out.println(file.getName());
             //System.out.println("[+] start");
@@ -51,7 +57,7 @@ public class Main extends Application {
 */
             long start1 = System.nanoTime();
             HashSet<Doc> docs = new HashSet<>();
-            Parse parse = new Parse();
+            //Parse parse = new Parse();
             readFile.separateDocuments(file, docs);
             parse.doParse(docs);
             System.out.println("[+] doneParse" + file.getName());

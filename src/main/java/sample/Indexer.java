@@ -1,7 +1,5 @@
 package sample;
-
 import javafx.geometry.Pos;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
@@ -67,7 +65,6 @@ public class Indexer {
         HashMap<String, Integer> linkedList = new LinkedHashMap<>();
         linkedList.put(doc.getDocNumber(), 1);
         tmpPosting.put(term, linkedList);
-        //tmpPosting.get(term).add((post));
     }
     private void editTerm(String term, Doc doc) {
         /*int res;
@@ -77,12 +74,20 @@ public class Indexer {
         else {
             ((PostEntry)tmpPosting.get(term).toArray()[res]).increaseTf();
            }*/
+
         HashMap<String, Integer> postEntries = tmpPosting.get(term);
-        Integer post = postEntries.get(doc.getDocNumber());//conInPosting(doc.getDocNumber(), term);
-        if(post!=null)
-            post++;
-        else
-            postEntries.put(doc.getDocNumber(), 1);
+        if(postEntries==null) {
+            HashMap<String, Integer> linkedList = new LinkedHashMap<>();
+            linkedList.put(doc.getDocNumber(), 1);
+            tmpPosting.put(term, linkedList);
+        }
+        else{
+            Integer post = postEntries.get(doc.getDocNumber());//conInPosting(doc.getDocNumber(), term);
+            if (post != null)
+                post++;
+            else
+                postEntries.put(doc.getDocNumber(), 1);
+        }
     }
 
     public Map<String, DicEntry> getDic() {
@@ -101,8 +106,9 @@ public class Indexer {
     }
 
 
-    /*public synchronized void transferToDisk() throws IOException {
-        LinkedList<PostEntry> list;
+    public synchronized void transferToDisk() throws IOException {
+        tmpPosting.clear();
+/*        LinkedList<PostEntry> list;
         File file;
         for (String term : tmpPosting.keySet())
         {
@@ -124,7 +130,6 @@ public class Indexer {
                 } finally {
                     outFile.close();
                 }
-        }
-
         }*/
+    }
 }

@@ -29,8 +29,8 @@ public class Parse {
         shortMonths = Arrays.asList(dateFormatSymbols.getShortMonths());
         shortMonths.replaceAll(String::toLowerCase);
         stemmer = new Stemmer();
-            for(Doc doc : docs) {
-                tokens= doc.docToString().split(" ");
+        for(Doc doc : docs) {
+            tokens= doc.docToString().split(" ");
             for (int i = 0; i < tokens.length; i++) {
                 String tok = tokens[i];
                 boolean isDollar = false;
@@ -276,8 +276,12 @@ public class Parse {
 
    }
 
-   public void transferDisk() throws IOException {
-       //Main.indexer.transferToDisk();
+   public void transferDisk() {
+       try {
+           Main.indexer.transferToDisk();
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
    }
 
     public void removeStopWords( Set<String> stopWords) {
