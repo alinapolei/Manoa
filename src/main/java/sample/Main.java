@@ -18,19 +18,17 @@ public class Main extends Application {
 
 
     public Set<String> stopWords = new HashSet<>();
-    public static Indexer indexer;
+    public volatile static Indexer indexer;
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
 
         List<File> allFiles = new ArrayList<File>();
-        getAllFiles("C:\\\\Users\\\\alina\\\\Documents\\\\semester 5\\\\IR\\\\corpus\\\\corpus", allFiles);
+        getAllFiles("C:\\Users\\Dror\\Desktop\\corpuss", allFiles);
         ReadFile readFile = new ReadFile();
         readFile.setStopWords(stopWords);
-        indexer=new Indexer();
+        indexer = new Indexer();
         ExecutorService executor = Executors.newFixedThreadPool(5);
-        //pool.
-        //Parse parse = new Parse(index);
         //HashSet<Doc> docs = new HashSet<>();
         long start = System.nanoTime();
         Parse parse = new Parse();
@@ -39,35 +37,35 @@ public class Main extends Application {
             //System.out.println(file.getName());
             //System.out.println("[+] start");
             //readFile.separateDocuments(file, docs);
-            executor.execute(
+              executor.execute(
             new Thread(){
-                   public void run(){
-                       HashSet<Doc> docs = new HashSet<>();
-                       Parse parse = new Parse();
-                       readFile.separateDocuments(file, docs);
-                       parse.doParse(docs);
-                       System.out.println("[+] doneParse" + file.getName());
-                       docs.clear();
-                   }
-               });
+             public void run(){
 
-
-            // parse.doParse(docs);
-            //System.out.println("parse file: " +(System.nanoTime()-start1)*Math.pow(10, -9));
-
+            HashSet<Doc> docs = new HashSet<>();
+            Parse parse = new Parse();
+            readFile.separateDocuments(file, docs);
+            parse.doParse(docs);
+            System.out.println("[+] doneParse" + file.getName());
+            docs.clear();
         }
-        //parse.setAllTerms();
-       // parse.removeStopWords(stopWords);
-       // parse.transferDisk();
-        while (!executor.isTerminated()) {
-        }
-        executor.shutdown();
+        });
+
+
+        // parse.doParse(docs);
+        //System.out.println("parse file: " +(System.nanoTime()-start1)*Math.pow(10, -9));
+    }
+    //parse.setAllTerms();
+    // parse.removeStopWords(stopWords);
+    // parse.transferDisk();
+    // executor.shutdown();
+
+    //  while (!executor.isTerminated()) {
+    //}
+
         System.out.println("sum: "+(System.nanoTime()-start)*Math.pow(10, -9));
-
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("My Manoa");
         primaryStage.setScene(new Scene(root, 300, 275));
-//        System.out.println("here");
         primaryStage.show();
     }
 
@@ -85,8 +83,6 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) throws IOException {
-
-
         launch(args);
     }
 }

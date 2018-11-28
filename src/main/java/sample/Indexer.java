@@ -73,7 +73,7 @@ public class Indexer {
         tmpPosting.put(term,new LinkedList<>());
         tmpPosting.get(term).add((post));
     }
-    private void editTerm(String term, Doc doc) {
+    private synchronized void editTerm(String term, Doc doc) {
         int res = conInPosting(doc.getDocNumber(), term);
         if(res==-1)
             tmpPosting.get(term).add(new PostEntry(doc.getDocNumber()));
@@ -107,9 +107,9 @@ public class Indexer {
         {
             list=tmpPosting.get(term);
             if(con.isAlpha(term))
-                file =new File ("C:\\Users\\alina\\Desktop\\Posting\\"+term.substring(0,1).toUpperCase()+".txt");
+                file =new File ("C:\\Users\\Dror\\Desktop\\Posting\\"+term.substring(0,1).toUpperCase()+".txt");
             else
-                file =new File ("C:\\Users\\alina\\Desktop\\Posting\\"+"Numbers"+".txt");
+                file =new File ("C:\\Users\\Dror\\Desktop\\Posting\\"+"Numbers"+".txt");
                 FileWriter outFile = new FileWriter(file,true);
             for(PostEntry post: list)
                 try {
