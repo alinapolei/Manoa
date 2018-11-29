@@ -6,7 +6,10 @@ public class PostEntry {
 
     public PostEntry(String name) {
         this.docNumber = name;
-        //tf = 1;
+    }
+
+    public void setTf(int tf) {
+        this.tf = tf;
     }
 
     public int getTf() {
@@ -24,7 +27,7 @@ public class PostEntry {
 
     @Override
     public String toString() {
-        return "docNumber='" + docNumber + ' ' +
-                "tf=" + tf + "\n";
+        return docNumber + ' ' +
+                 + tf ;
     }
 }

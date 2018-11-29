@@ -5,7 +5,6 @@ public class DicEntry {
    private String term;
    private int df;
    private int tfCourpus;
-   private int ptr;
 
     public DicEntry(String term) {
         this.term = term;
@@ -37,11 +36,4 @@ public class DicEntry {
        tfCourpus = fCourpus;
     }
 
-    public int getPtr() {
-        return ptr;
-    }
-
-    public void setPtr(int ptr) {
-        this.ptr = ptr;
-    }
 }

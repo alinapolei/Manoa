@@ -1,5 +1,6 @@
 package sample;
 
+import com.mashape.unirest.http.exceptions.UnirestException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -13,26 +14,11 @@ public class ReadFile {
     public ReadFile() {
     }
 
-    /*public ReadFile(String path, HashSet<Doc> hashSet,Set<String> stopWords) {
-        //List<File> allFiles = new ArrayList<File>();
-        //getAllFiles(path, allFiles);
-        separateDocuments(allFiles, hashSet);
-        System.out.println("num of files" + allFiles.size());
-        try {
-            setStopWords(stopWords);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //System.out.println(hashSet.size());
-    }*/
-
-
     public void separateDocuments(File file, HashSet<Doc> hashSet) {
             try {
                 int i=0;
                 Document doc = Jsoup.parse(file, "utf-8");
                 Elements x = doc.getElementsByTag("Doc");
-                //System.out.println(x.size());
                 for (i=0;i<x.size();i++) {
                     Doc temp=new Doc();
                     temp.setDocNumber(x.get(i).getElementsByTag("DOCNO").text());
@@ -43,7 +29,11 @@ public class ReadFile {
                    else if(temp.getDocNumber().startsWith("LA"))
                        setDocParrameters(temp,x.get(i),"Date","HEADLINE");
 
-
+                    try {
+                        temp.setCity(doc.getElementsByTag("F").toArray());
+                    } catch (UnirestException e) {
+                        e.printStackTrace();
+                    }
                     hashSet.add(temp);
                     //System.out.println(hashSet.size());
                 }
@@ -65,6 +55,7 @@ public class ReadFile {
         temp.setHeadLine(x.getElementsByTag(headTag).text());
 
     }
+
 
     public void setStopWords(Set<String> stopWords) throws IOException {
             File file=new File("C:\\Users\\Dror\\Desktop\\Stop_Words.txt");

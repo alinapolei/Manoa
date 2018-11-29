@@ -17,50 +17,43 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class Main extends Application {
 
 
-    public Set<String> stopWords = new HashSet<>();
-    public volatile static Indexer indexer;
+    public static Set<String> stopWords = new HashSet<>();
+    public static Indexer indexer;
+    public static Map <String,City> cityIndexer=new HashMap<>();
+    public static HashSet<Doc> allDocs;
+    static int counter = 0;
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
-
+    public void start(Stage primaryStage) throws Exception{
+        allDocs = new HashSet<>();
         List<File> allFiles = new ArrayList<File>();
-        getAllFiles("C:\\Users\\Dror\\Desktop\\corpuss", allFiles);
+        getAllFiles("C:\\Users\\Dror\\Desktop\\corpus", allFiles);
         ReadFile readFile = new ReadFile();
         readFile.setStopWords(stopWords);
-        indexer = new Indexer();
-        ExecutorService executor = Executors.newFixedThreadPool(5);
+        indexer=new Indexer();
+        Parse parse = new Parse();
         //HashSet<Doc> docs = new HashSet<>();
         long start = System.nanoTime();
-        Parse parse = new Parse();
+        counter = 0;
         for (File file : allFiles) {
-            // docs.clear();
-            //System.out.println(file.getName());
-            //System.out.println("[+] start");
-            //readFile.separateDocuments(file, docs);
-              executor.execute(
-            new Thread(){
-             public void run(){
-
+            counter++;
+            if(counter == 200) {
+                parse.transferDisk();
+                indexer.transferDocsData(allDocs);
+                counter = 0;
+            }
+            long start1 = System.nanoTime();
             HashSet<Doc> docs = new HashSet<>();
-            Parse parse = new Parse();
             readFile.separateDocuments(file, docs);
             parse.doParse(docs);
             System.out.println("[+] doneParse" + file.getName());
+            allDocs.addAll(docs);
             docs.clear();
+            System.out.println("sum: "+(System.nanoTime()-start1)*Math.pow(10, -9));
+
         }
-        });
-
-
-        // parse.doParse(docs);
-        //System.out.println("parse file: " +(System.nanoTime()-start1)*Math.pow(10, -9));
-    }
-    //parse.setAllTerms();
-    // parse.removeStopWords(stopWords);
-    // parse.transferDisk();
-    // executor.shutdown();
-
-    //  while (!executor.isTerminated()) {
-    //}
+        parse.transferDisk();
+        indexer.transferDocsData(allDocs);
 
         System.out.println("sum: "+(System.nanoTime()-start)*Math.pow(10, -9));
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
@@ -83,6 +76,8 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) throws IOException {
+
+
         launch(args);
     }
 }
