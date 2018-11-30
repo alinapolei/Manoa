@@ -11,7 +11,7 @@ public class Indexer {
     private Map<String, DicEntry> upTerms;
     private Map<String, DicEntry> mixTerms;
     private Map<String, HashMap<String, PostEntry>> tmpPosting;
-    Conditions con = new Conditions();
+    Conditions con;
 
 
 
@@ -21,61 +21,62 @@ public class Indexer {
         upTerms = Collections.synchronizedMap(new HashMap<>());
         mixTerms = Collections.synchronizedMap(new HashMap<>());
         tmpPosting = Collections.synchronizedMap(new HashMap<>());
+        con = new Conditions();
     }
 
-    public void setDic(String term,Doc doc) {
+    public void setDic(String term,Doc doc, boolean isTitle) {
         if (!this.dic.containsKey(term)) {
-            newTerm(term, doc, this.dic);
+            newTerm(term, doc, this.dic, isTitle);
             doc.increaseNumOfWords();
             if(doc.getMaxtf() == 0)
                 doc.setMaxtf(1);
         }
         else{
             this.dic.get(term).setTfCourpus( this.dic.get(term).getTfCourpus()+1);
-            editTerm(term, doc, this.dic);
+            editTerm(term, doc, this.dic, isTitle);
         }
     }
 
-    public void setLowerTerms(String term,Doc doc) {
+    public void setLowerTerms(String term,Doc doc, boolean isTitle) {
         if (!this.lowTerms.containsKey(term))
-            newTerm(term, doc, this.lowTerms);
+            newTerm(term, doc, this.lowTerms, isTitle);
         else{
             int x=this.lowTerms.get(term).getTfCourpus()+1;
             this.lowTerms.get(term).setTfCourpus(x) ;
-            editTerm(term, doc, this.lowTerms);
+            editTerm(term, doc, this.lowTerms, isTitle);
         }
     }
 
-    public void setUpperTerms(String term,Doc doc) {
+    public void setUpperTerms(String term,Doc doc, boolean isTitle) {
         if (!this.upTerms.containsKey(term))
-            newTerm(term, doc, this.upTerms);
+            newTerm(term, doc, this.upTerms, isTitle);
         else{
             this.upTerms.get(term).setTfCourpus( this.upTerms.get(term).getTfCourpus()+1);
-            editTerm(term, doc, this.upTerms);
+            editTerm(term, doc, this.upTerms, isTitle);
         }
     }
 
-    public void setMixedTerms(String term,Doc doc) {
+    public void setMixedTerms(String term,Doc doc, boolean isTitle) {
         if (!this.mixTerms.containsKey(term))
-            newTerm(term, doc, this.mixTerms);
+            newTerm(term, doc, this.mixTerms, isTitle);
         else{
             this.mixTerms.get(term).setTfCourpus( this.mixTerms.get(term).getTfCourpus()+1);
-            editTerm(term, doc, this.mixTerms);
+            editTerm(term, doc, this.mixTerms, isTitle);
         }
     }
-    private void newTerm(String term, Doc doc, Map<String, DicEntry> terms) {
+    private void newTerm(String term, Doc doc, Map<String, DicEntry> terms, boolean isTitle) {
         DicEntry dicEntry=new DicEntry(term);
-        PostEntry post =new PostEntry(doc.getDocNumber());
+        //PostEntry post =new PostEntry(doc.getDocNumber(), isTitle);
         terms.put(term, dicEntry);
         HashMap<String, PostEntry> linkedList = new LinkedHashMap<>();
-        linkedList.put(doc.getDocNumber(), new PostEntry(doc.getDocNumber()));
+        linkedList.put(doc.getDocNumber(), new PostEntry(doc.getDocNumber(), isTitle));
         tmpPosting.put(term, linkedList);
     }
-    private void editTerm(String term, Doc doc, Map<String, DicEntry> terms) {
+    private void editTerm(String term, Doc doc, Map<String, DicEntry> terms, boolean isTitle) {
         HashMap<String, PostEntry> postEntries = tmpPosting.get(term);
         if(postEntries==null) {
             HashMap<String, PostEntry> linkedList = new LinkedHashMap<>();
-            linkedList.put(doc.getDocNumber(), new PostEntry(doc.getDocNumber()));
+            linkedList.put(doc.getDocNumber(), new PostEntry(doc.getDocNumber(), isTitle));
             tmpPosting.put(term, linkedList);
             //doc.increaseNumOfWords();
             //if(doc.getMaxtf() == 0)
@@ -85,12 +86,14 @@ public class Indexer {
             PostEntry post = postEntries.get(doc.getDocNumber());//conInPosting(doc.getDocNumber(), term);
             if (post != null) {
                 post.increaseTf();
+                if(!post.isTitle() && isTitle)
+                    post.setTitle(true);
                 if(terms == dic)
                     if(doc.getMaxtf()<post.getTf())
                         doc.setMaxtf(post.getTf());
             }
             else {
-                postEntries.put(doc.getDocNumber(), new PostEntry(doc.getDocNumber()));
+                postEntries.put(doc.getDocNumber(), new PostEntry(doc.getDocNumber(), isTitle));
                 DicEntry de = terms.get(term);
                 de.setDf(de.getDf()+1);
                 if(terms == dic) {
@@ -128,34 +131,61 @@ public class Indexer {
     }
 
 
-    public void transferToDisk() throws IOException {
+    public void transferToDisk(String path) throws IOException {
         removeStopWordfromtmpPosting(Main.stopWords);
         removeStopWords(Main.stopWords);
         setAllTerms();
+        System.out.println("[+]Finish setall Terms");
         HashMap<String, PostEntry> list;
         File file;
         ArrayList<String> sortList=a();
         Map<Character, ArrayList<String>>Finalsort=b(sortList);
+        PrintWriter out=null;
         for(Character x : Finalsort.keySet()) {
+                file = new File(path + "\\" + x + ".txt");
+                /*
+            else if (term.toCharArray()[0]=='$')
+                file = new File(path + "\\" + "$" + ".txt");
+            else if (term.toCharArray()[0]=='0')
+                file = new File(path + "\\" + "0" + ".txt");
+            else if (term.toCharArray()[0]=='1')
+                file = new File(path + "\\" + "1" + ".txt");
+            else if (term.toCharArray()[0]=='2')
+                file = new File(path + "\\" + "2" + ".txt");
+            else if (term.toCharArray()[0]=='3')
+                file = new File(path + "\\" + "3" + ".txt");
+            else if (term.toCharArray()[0]=='4')
+                file = new File(path + "\\" + "4" + ".txt");
+            else if (term.toCharArray()[0]=='5')
+                file = new File(path + "\\" + "5" + ".txt");
+            else if (term.toCharArray()[0]=='6')
+                file = new File(path + "\\" + "6" + ".txt");
+            else if (term.toCharArray()[0]=='7')
+                file = new File(path + "\\" + "7" + ".txt");
+            else if (term.toCharArray()[0]=='8')
+                file = new File(path + "\\" + "8" + ".txt");
+            else if (term.toCharArray()[0]=='9')
+                file = new File(path + "\\" + "9" + ".txt");
+            else
+                file = new File(path + "\\" + "tmp" + ".txt");
+            */
             sortList.clear();
             sortList = Finalsort.get(x);
-            PrintWriter out = null;
+             out = null;
             for (String term : sortList) {
                 list = tmpPosting.get(term);
-                if (con.isAlpha(term))
-                    file = new File("C:\\Users\\Dror\\Desktop\\Posting\\" + term.substring(0, 1).toUpperCase() + ".txt");
-                else
-                    file = new File("C:\\Users\\Dror\\Desktop\\Posting\\" + "Numbers" + ".txt");
                 FileWriter fos = new FileWriter(file, true);
                 out = new PrintWriter(fos, true);
                 String t = "";
                 for (PostEntry post : list.values())
-                    t = t + post.getDocNumber() + " " + post.getTf() + ",";
+                    t = t + post.toString() + ", ";
                 out.println(term + " " + t);
             }
             if(out!=null)
-            out.close();
+                out.close();
         }
+        if(out!=null)
+            out.close();
         tmpPosting.clear();
     }
     public ArrayList<String> a() {
@@ -193,18 +223,19 @@ public class Indexer {
         return tmpPosting;
     }
     public void setAllTerms(){
-        for(Map.Entry<String, DicEntry> entery : mixTerms.entrySet()){
-            String term = entery.getKey();
+        for(String term : mixTerms.keySet()){
+            //String term = entery.getKey();
+            DicEntry entery = mixTerms.get(term);
             DicEntry inUp = upTerms.get(term.toUpperCase());
             DicEntry inLow = lowTerms.get(term.toLowerCase());
             if(inUp != null || inLow != null){
-                DicEntry combinedEntery = combineEnteries(term.toLowerCase(), entery.getValue(), inLow, inUp);
+                DicEntry combinedEntery = combineEnteries(term.toLowerCase(), entery, inLow, inUp);
                 dic.put(term.toLowerCase(), combinedEntery);
                 upTerms.remove(term.toUpperCase());
                 lowTerms.remove(term.toLowerCase());
             }
             else {
-                dic.put(term.toUpperCase(), entery.getValue());
+                dic.put(term.toUpperCase(), entery);
                 HashMap<String, PostEntry> postForEntery = tmpPosting.remove(term);
                 tmpPosting.put(term.toUpperCase(), postForEntery);
 
@@ -241,10 +272,12 @@ public class Indexer {
     }
     private void updateDocDetails(HashMap<String, PostEntry> postForEntery) {
         for (PostEntry pdoc : postForEntery.values()) {
-            Doc doc = Main.allDocs.stream().filter(x -> x.getDocNumber().equals(pdoc.getDocNumber())).findFirst().get();
-            doc.increaseNumOfWords();
-            if (doc.getMaxtf() < pdoc.getTf())
-                doc.setMaxtf(pdoc.getTf());
+            Doc doc = Main.allDocs.get(pdoc.getDocNumber());
+            if (doc!=null) {
+                doc.increaseNumOfWords();
+                if (doc.getMaxtf() < pdoc.getTf())
+                    doc.setMaxtf(pdoc.getTf());
+            }
         }
     }
 
@@ -278,10 +311,13 @@ public class Indexer {
         HashMap<String, PostEntry> post = tmpPosting.get(termToSearch);
         for(PostEntry postEntry : post.values()){
             PostEntry p = combinedPost.get(postEntry.getDocNumber());
-            Doc doc = Main.allDocs.stream().filter(x -> x.getDocNumber().equals(postEntry.getDocNumber())).findFirst().get();
+            //Doc doc = Main.allDocs.stream().filter(x -> x.getDocNumber().equals(postEntry.getDocNumber())).findFirst().get();
+            Doc doc = Main.allDocs.get(postEntry.getDocNumber());
 
             if(p!=null) {
                 p.setTf(p.getTf() + postEntry.getTf());
+                if(postEntry.isTitle())
+                    p.setTitle(true);
                 if(doc.getMaxtf()<p.getTf())
                     doc.setMaxtf(p.getTf());
             }
@@ -294,9 +330,9 @@ public class Indexer {
         }
         tmpPosting.remove(termToSearch);
     }
-    public void transferDocsData(HashSet<Doc> allDocs) {
+    public void transferDocsData(HashSet<Doc> allDocs, String path) {
         try {
-            BufferedWriter out = new BufferedWriter(new FileWriter("C:\\Users\\Dror\\Desktop\\Posting\\Documents.txt"));
+            BufferedWriter out = new BufferedWriter(new FileWriter(path + "\\Documents.txt"));
             Iterator it = allDocs.iterator();
             while(it.hasNext()) {
                 out.write(it.next().toString());

@@ -14,13 +14,13 @@ public class ReadFile {
     public ReadFile() {
     }
 
-    public void separateDocuments(File file, HashSet<Doc> hashSet) {
+    public void separateDocuments(File file, HashSet<Doc> hashSet) throws Exception {
             try {
                 int i=0;
                 Document doc = Jsoup.parse(file, "utf-8");
                 Elements x = doc.getElementsByTag("Doc");
+                Doc temp=new Doc();
                 for (i=0;i<x.size();i++) {
-                    Doc temp=new Doc();
                     temp.setDocNumber(x.get(i).getElementsByTag("DOCNO").text());
                    if (temp.getDocNumber().startsWith("FB"))
                        setDocParrameters(temp,x.get(i),"date1","TI");
@@ -30,11 +30,12 @@ public class ReadFile {
                        setDocParrameters(temp,x.get(i),"Date","HEADLINE");
 
                     try {
-                        temp.setCity(doc.getElementsByTag("F").toArray());
+                        temp.setCity(x.get(i).getElementsByTag("F").toArray());
                     } catch (UnirestException e) {
                         e.printStackTrace();
                     }
                     hashSet.add(temp);
+                    temp=new Doc();
                     //System.out.println(hashSet.size());
                 }
 
@@ -57,8 +58,8 @@ public class ReadFile {
     }
 
 
-    public void setStopWords(Set<String> stopWords) throws IOException {
-            File file=new File("C:\\Users\\Dror\\Desktop\\Stop_Words.txt");
+    public void setStopWords(Set<String> stopWords, String path) throws IOException {
+        File file=new File(path);
         String []stopWordsArray =(String.join("\n", Files.readAllLines(file.toPath()))).split("\n");
         for (int i=0;i<stopWordsArray.length;i++)
             stopWords.add(stopWordsArray[i]);

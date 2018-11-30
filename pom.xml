@@ -69,6 +69,14 @@
             <artifactId>lucene-core</artifactId>
             <version>7.1.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-io -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+
+
     </dependencies>
     <properties>
         <maven.compiler.source>10</maven.compiler.source>

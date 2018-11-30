@@ -3,8 +3,10 @@ package sample;
 public class PostEntry {
     private String docNumber;
     private int tf=1;
+    private boolean isTitle;
 
-    public PostEntry(String name) {
+    public PostEntry(String name, boolean isTitle) {
+        this.isTitle = isTitle;
         this.docNumber = name;
     }
 
@@ -25,9 +27,17 @@ public class PostEntry {
         return docNumber;
     }
 
+    public boolean isTitle() {
+        return isTitle;
+    }
+
+    public void setTitle(boolean title) {
+        isTitle = title;
+    }
+
     @Override
     public String toString() {
         return docNumber + ' ' +
-                 + tf ;
+                 + tf + ' ' + (isTitle ? "V" : "X");
     }
 }

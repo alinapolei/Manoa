@@ -36,4 +36,8 @@ public class DicEntry {
        tfCourpus = fCourpus;
     }
 
+    @Override
+    public String toString() {
+        return  "term=" + term + " df=" + df + " tfCourpus=" + tfCourpus;
+    }
 }

@@ -16,7 +16,7 @@ public class Doc {
     private String header;
     private  String headLine;
     private String bodyText;
-    private String city=null;
+    private String city="";
     private int maxtf;
     private int numOfWords;
 
@@ -25,26 +25,35 @@ public class Doc {
         return city;
     }
 
-    public void setCity(Object[] arry) throws UnirestException {
-        Object [] array=arry;
-        for(int i=0;i<array.length;i++) {
-            if ((array[i].toString()).contains("<f p=\"104\">"))
-               city= ((array[i].toString()).split("<f p=\"104\">"))[1].split(" ")[0].toUpperCase();
+    public void setCity(Object[] arry) throws Exception {
+        Object[] array = arry;
+        for (int i = 0; i < array.length; i++) {
+            if ((array[i].toString()).contains("<f p=\"104\">")) {
+                String[] tmpp= array[i].toString().split("<f p=\"104\">")[1].split(" ");
+                for (int k=0;k<tmpp.length;k++)
+                    if(!tmpp[k].equals("")&&!tmpp[k].equals("\n")&&tmpp[k].compareTo("</f>")!=0) {
+                        city = tmpp[k].toUpperCase();
+                        break;
+                    }
+                break;
+            }
+
         }
-        if(city!=null) {
-/*
-            HttpResponse<JsonNode> response = Unirest.get("https://restcountries.eu/rest/v2/alpha/Tallin")
+        if (city!=("")&&city.compareTo("\n")!=0) {
+            HttpResponse<JsonNode> response = Unirest.get("http://getcitydetails.geobytes.com/GetCityDetails?fqcn="+city.toLowerCase())
                     .header("X-Mashape-Key", "<required>")
                     .header("Accept", "application/json")
                     .asJson();
-            Object map=  (response.getBody().getArray().get(0));
-            String t=((JSONObject) map).get("area").toString();
-            */
-            System.out.println("here");
-            // Main.cityIndexer.put(City, new City(City, ))
-            }
-        }
+            Object map = (response.getBody().getArray().get(0));
+            String cur=((JSONObject) map).get("geobytescurrency").toString();
+            String Cuntry=((JSONObject) map).get("geobytescountry").toString();
+            String pop=((JSONObject) map).get("geobytespopulation").toString();
+            Conditions con=new Conditions();
+            pop=con.parseNumber(pop);
+            Main.cityIndexer.put(docNumber, new City(city,cur,pop,docNumber ));
 
+        }
+    }
     public Doc() {}
 
     public String getDocNumber() {
@@ -87,7 +96,9 @@ public class Doc {
         this.bodyText = bodyText;
     }
 
-    public String docToString(){return this.headLine+" "+this.bodyText;}
+    public String[] docToString(){
+        return new String[]{this.headLine, this.bodyText};
+    }
 
     public int getMaxtf() {
         return maxtf;
