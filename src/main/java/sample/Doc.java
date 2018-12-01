@@ -32,27 +32,35 @@ public class Doc {
                 String[] tmpp= array[i].toString().split("<f p=\"104\">")[1].split(" ");
                 for (int k=0;k<tmpp.length;k++)
                     if(!tmpp[k].equals("")&&!tmpp[k].equals("\n")&&tmpp[k].compareTo("</f>")!=0) {
-                        //city = tmpp[k].toUpperCase();
+                        city = tmpp[k].toUpperCase();
                         break;
                     }
                 break;
             }
 
         }
-        /*if (city!=("")&&city.compareTo("\n")!=0) {
-            HttpResponse<JsonNode> response = Unirest.get("http://getcitydetails.geobytes.com/GetCityDetails?fqcn="+city.toLowerCase())
-                    .header("X-Mashape-Key", "<required>")
-                    .header("Accept", "application/json")
-                    .asJson();
-            Object map = (response.getBody().getArray().get(0));
-            String cur=((JSONObject) map).get("geobytescurrency").toString();
-            String Cuntry=((JSONObject) map).get("geobytescountry").toString();
-            String pop=((JSONObject) map).get("geobytespopulation").toString();
-            Conditions con=new Conditions();
-            pop=con.parseNumber(pop);
-            Main.cityIndexer.put(docNumber, new City(city,cur,pop,docNumber ));
+        if (city!=("")&&city.compareTo("\n")!=0) {
+            if(!Main.CityStorage.containsKey(city)) {
+                HttpResponse<JsonNode> response = Unirest.get("http://getcitydetails.geobytes.com/GetCityDetails?fqcn=" + city.toLowerCase())
+                        .header("X-Mashape-Key", "<required>")
+                        .header("Accept", "application/json")
+                        .asJson();
+                Object map = (response.getBody().getArray().get(0));
+                String cur = ((JSONObject) map).get("geobytescurrency").toString();
+                String Cuntry = ((JSONObject) map).get("geobytescountry").toString();
+                String pop = ((JSONObject) map).get("geobytespopulation").toString();
+                Conditions con = new Conditions();
+                pop = con.parseNumber(pop);
+                Main.cityIndexer.put(docNumber, new City(city, cur, pop, docNumber));
+                Main.CityStorage.put(city,new City(city,cur,pop,""));
+            }
+            else {
+                String cur = Main.CityStorage.get(city).getCurrency();
+                String pop = Main.CityStorage.get(city).getPop();
+                Main.cityIndexer.put(docNumber,new City(city,cur,pop,docNumber));
+            }
 
-        }*/
+        }
     }
     public Doc() {}
 

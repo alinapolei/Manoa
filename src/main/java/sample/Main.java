@@ -26,6 +26,7 @@ public class Main extends Application {
     public static Indexer indexer;
     public static Map<String,City> cityIndexer=new HashMap<>();
     public static HashMap<String, Doc> allDocs;
+    public static HashMap<String,City>CityStorage=new HashMap<>();
 
     /*
     public static void startRetriving(boolean isStem) throws Exception{
