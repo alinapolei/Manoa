@@ -39,36 +39,33 @@ public class Parse {
                 for (int i = 0; i < tokens.length; i++) {
                     String tok = tokens[i];
                     boolean isDollar = false;
-                    //while ((!tok.matches("^\\w.*") || tok.startsWith("\n")) && !tok.equals("") && !tok.startsWith("$") && !tok.startsWith("\""))
-                    while (tok.length() > 0 && ((!Character.isLetter(tok.charAt(0)) && !Character.isDigit(tok.charAt(0))) || tok.startsWith("\n")) && !tok.equals("") && !tok.startsWith("$") && !tok.startsWith("\""))
-                        tok = tok.substring(1);
-                    //while ((!tok.matches(".*\\w$") || tok.endsWith("\n")) && !tok.endsWith("%") && !tok.endsWith("$") && !tok.equals("") && !tok.startsWith("\""))
-                    while (tok.length() > 0 && ((!Character.isLetter(tok.charAt(tok.length() - 1)) && !Character.isDigit(tok.charAt(tok.length() - 1))) || tok.endsWith("\n")) && !tok.endsWith("%") && !tok.endsWith("$") && !tok.equals("") && !tok.startsWith("\""))
-                        tok = tok.substring(0, tok.length() - 1);
-                    if (tok.equals("")) continue;
-
-                    if (tok.equals("") || tok.equals(" "))
-                        System.out.println("boom");
+                    tok = cleanTok(tok);
+                    if (tok.equals("") || tok.equals(" ")) continue;
 
                     if (tok.startsWith("\"")) {
                         tok = tok.replaceFirst("\"", "");
+                        int c = i;
+                        String cc = tok;
                         if (!tok.endsWith("\"")) {
-                            word(tok, isStem, doc, isTitle, i);
+                            //word(tok, isStem, doc, isTitle, i);
                             i++;
                             while (i < tokens.length && !tokens[i].endsWith("\"")) {
-                                String word = tokens[i];
-                                word(word, isStem, doc, isTitle, i);
+                                //String word = tokens[i];
+                                //word(word, isStem, doc, isTitle, i);
                                 tok += (" " + tokens[i]);
                                 i++;
                             }
                             if (i < tokens.length) {
-                                String word = tokens[i].replace("\"", "");
-                                word(word, isStem, doc, isTitle, i);
+                                //String word = tokens[i].replace("\"", "");
+                                //word(word, isStem, doc, isTitle, i);
                                 tok = tok + " " + tokens[i];
                             }
                         }
                         tok = tok.replace("\"", "");
                         if (tok.equals("") || tok.equals(" ")) continue;
+                        Main.indexer.setDic(tok, doc, isTitle);
+                        i=c;
+                        tok = cc;
                     } else if (tok.contains("-")) {
                         Main.indexer.setDic(tok, doc, isTitle);
                         //terms.add(tok);
@@ -174,7 +171,6 @@ public class Parse {
                                         tok = parts[0].substring(0, parts[0].length() - 6) + "." + parts[0].substring(parts[0].length() - 6) + parts[1] + "M";
                                     else if (parts[0].length() > 9 && parts[0].length() <= 12)
                                         tok = parts[0].substring(0, parts[0].length() - 9) + "." + parts[0].substring(parts[0].length() - 9) + parts[1] + "B";
-
                                 }
                             } else {
                                 if (tok.matches("\\d{1,3}\\,\\d\\d\\d")) {
@@ -232,15 +228,25 @@ public class Parse {
                     }
 
                     //tokens[i] = tok;
-                    if (tok.equals("") || tok.equals(" ") || tok.equals("-") || tok.equals("*"))
-                        System.out.println("boom");
                     Main.indexer.setDic(tok, doc, isTitle);
                     //terms.add(tok);
                 }
             }
         }
     }
+    private String cleanTok(String tok){
+        //while ((!tok.matches("^\\w.*") || tok.startsWith("\n")) && !tok.equals("") && !tok.startsWith("$") && !tok.startsWith("\""))
+        while (tok.length() > 0 && ((!Character.isLetter(tok.charAt(0)) && !Character.isDigit(tok.charAt(0))) || tok.startsWith("\n")) && !tok.equals("") && !tok.startsWith("$") && !tok.startsWith("\""))
+            tok = tok.substring(1);
+        //while ((!tok.matches(".*\\w$") || tok.endsWith("\n")) && !tok.endsWith("%") && !tok.endsWith("$") && !tok.equals("") && !tok.startsWith("\""))
+        while (tok.length() > 0 && ((!Character.isLetter(tok.charAt(tok.length() - 1)) && !Character.isDigit(tok.charAt(tok.length() - 1))) || tok.endsWith("\n") || tok.endsWith("'s")) && !tok.endsWith("%") && !tok.endsWith("$") && !tok.equals(""))
+            tok = tok.substring(0, tok.length() - 1);
+
+        return tok;
+    }
     private void word(String tok, boolean isStem, Doc doc, boolean isTitle, int i){
+        tok = cleanTok(tok);
+
         if(doc.getCity()!="" && tok.toUpperCase().equals(doc.getCity())){
             Main.cityIndexer.get(doc.getDocNumber()).getDocplace().add(i);
         }

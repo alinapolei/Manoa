@@ -186,7 +186,7 @@ public class Controller {
     }
 
     public void showCityDictionaryButton(ActionEvent actionEvent) {
-        if(Main.cityIndexer != null && Main.cityIndexer.values() != null) {
+        if(Main.cityIndexer != null && Main.cityIndexer.values().size() != 0) {
             TableView<City> table = new TableView<>();
             TableColumn<City, String> cityCol = new TableColumn<>("City");
             TableColumn<City, String> currencyCol = new TableColumn<>("Currency");

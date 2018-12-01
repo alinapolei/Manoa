@@ -32,14 +32,14 @@ public class Doc {
                 String[] tmpp= array[i].toString().split("<f p=\"104\">")[1].split(" ");
                 for (int k=0;k<tmpp.length;k++)
                     if(!tmpp[k].equals("")&&!tmpp[k].equals("\n")&&tmpp[k].compareTo("</f>")!=0) {
-                        city = tmpp[k].toUpperCase();
+                        //city = tmpp[k].toUpperCase();
                         break;
                     }
                 break;
             }
 
         }
-        if (city!=("")&&city.compareTo("\n")!=0) {
+        /*if (city!=("")&&city.compareTo("\n")!=0) {
             HttpResponse<JsonNode> response = Unirest.get("http://getcitydetails.geobytes.com/GetCityDetails?fqcn="+city.toLowerCase())
                     .header("X-Mashape-Key", "<required>")
                     .header("Accept", "application/json")
@@ -52,7 +52,7 @@ public class Doc {
             pop=con.parseNumber(pop);
             Main.cityIndexer.put(docNumber, new City(city,cur,pop,docNumber ));
 
-        }
+        }*/
     }
     public Doc() {}
 

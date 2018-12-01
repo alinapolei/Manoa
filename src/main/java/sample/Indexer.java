@@ -144,11 +144,15 @@ public class Indexer {
         FileWriter fos=null;
         for(Character x : Finalsort.keySet()) {
             Character character=x;
-            if(character=='"'||character==' '||character=='?')
+            /*if(character=='"'||character==' '||character=='?')
                 file=new File(path+"\\"+"rest"+".txt");
             else
                 file = new File(path + "\\" + x + ".txt");
-
+*/
+            if(!Character.isDigit(x.charValue()) && !Character.isLetter(x.charValue()) && character!='$')
+                file=new File(path+"\\"+"rest"+".txt");
+            else
+                file = new File(path + "\\" + x + ".txt");
 
             /*
             else if (term.toCharArray()[0]=='$')
