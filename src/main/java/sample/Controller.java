@@ -288,12 +288,17 @@ public class Controller {
                 Main.indexer.transferDocsData(new HashSet<Doc>(Main.allDocs.values()), postingpath);
                 double timeSum = (System.nanoTime() - start) * Math.pow(10, -9);
                 System.out.println("sum: " + (System.nanoTime() - start) * Math.pow(10, -9));
-
+                City maxCity=maxCityTerm();
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setHeaderText("Finished successfully to retrieve files");
                 alert.setContentText("num of documents: " + Main.allDocs.size() + "\n"
                                         + "num of terms: " + Main.indexer.getDic().size() + "\n"
-                                        + "runtime: " + timeSum);
+                                        +  "num of County: "+ Main.Country.size() +"\n"
+                                        +   "num of capital city: "+Main.Capital.size()+"\n"
+                                         +"num of non capital: "+(Main.CityStorage.size()-Main.Capital.size())+"\n"
+                                        +"num of all city: "+Main.CityStorage.size()+"\n"
+                                        +"max insance of city : "+maxCity.getDoc()+" "+maxCity.getName()+" "+maxCity.getDocplace().toString() +"\n"
+                                         + "runtime: " + timeSum);
                 alert.showAndWait();
                 alert.close();
             } catch (Exception e) {
@@ -301,6 +306,16 @@ public class Controller {
             }
         }
     }
+
+    private City maxCityTerm() {
+        City city = new City(" "," "," "," ");
+        for (City x :Main.cityIndexer.values()){
+            if(city.getDocplace().size()<x.getDocplace().size())
+                city = x;
+        }
+            return city;
+    }
+
     private void getAllFiles(String path, List<File> allFiles) {
         File directory = new File(path);
         File[] fileList = directory.listFiles();

@@ -153,33 +153,6 @@ public class Indexer {
                 file=new File(path+"\\"+"rest"+".txt");
             else
                 file = new File(path + "\\" + x + ".txt");
-
-            /*
-            else if (term.toCharArray()[0]=='$')
-                file = new File(path + "\\" + "$" + ".txt");
-            else if (term.toCharArray()[0]=='0')
-                file = new File(path + "\\" + "0" + ".txt");
-            else if (term.toCharArray()[0]=='1')
-                file = new File(path + "\\" + "1" + ".txt");
-            else if (term.toCharArray()[0]=='2')
-                file = new File(path + "\\" + "2" + ".txt");
-            else if (term.toCharArray()[0]=='3')
-                file = new File(path + "\\" + "3" + ".txt");
-            else if (term.toCharArray()[0]=='4')
-                file = new File(path + "\\" + "4" + ".txt");
-            else if (term.toCharArray()[0]=='5')
-                file = new File(path + "\\" + "5" + ".txt");
-            else if (term.toCharArray()[0]=='6')
-                file = new File(path + "\\" + "6" + ".txt");
-            else if (term.toCharArray()[0]=='7')
-                file = new File(path + "\\" + "7" + ".txt");
-            else if (term.toCharArray()[0]=='8')
-                file = new File(path + "\\" + "8" + ".txt");
-            else if (term.toCharArray()[0]=='9')
-                file = new File(path + "\\" + "9" + ".txt");
-            else
-                file = new File(path + "\\" + "tmp" + ".txt");
-            */
             sortList.clear();
             sortList = Finalsort.get(x);
             for (String term : sortList) {
@@ -192,19 +165,15 @@ public class Indexer {
                 out.println(term + " " + t);
 
             }
+            /*
             if (out!=null)
                 fos.flush();
                 out.close();
                 out = null;
                 System.gc();
-            if (fos!=null) {
-                fos.close();
                 fos=null;
-            }
-            // if(out!=null)
-            //    out.close();
+*/
         }
-            //out.close();
         tmpPosting.clear();
     }
     public ArrayList<String> a() {

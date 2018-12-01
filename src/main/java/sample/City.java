@@ -7,7 +7,6 @@ public class City {
     private String name;
     private String Currency;
     private String pop;
-
     private ArrayList<Integer> docplace;
 
 

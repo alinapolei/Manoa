@@ -27,7 +27,7 @@ public class Doc {
 
     public void setCity(Object[] arry) throws Exception {
         Object[] array = arry;
-        for (int i = 0; i < array.length; i++) {
+        for (int i =array.length-1; i >-1 ; i--) {
             if ((array[i].toString()).contains("<f p=\"104\">")) {
                 String[] tmpp= array[i].toString().split("<f p=\"104\">")[1].split(" ");
                 for (int k=0;k<tmpp.length;k++)
@@ -51,8 +51,12 @@ public class Doc {
                 String pop = ((JSONObject) map).get("geobytespopulation").toString();
                 Conditions con = new Conditions();
                 pop = con.parseNumber(pop);
+                String CapitalCity=((JSONObject) map).get("geobytescapital").toString();
                 Main.cityIndexer.put(docNumber, new City(city, cur, pop, docNumber));
                 Main.CityStorage.put(city,new City(city,cur,pop,""));
+                if(city.compareTo(CapitalCity)==0)
+                    Main.Capital.add(CapitalCity);
+                Main.Country.add(Cuntry);
             }
             else {
                 String cur = Main.CityStorage.get(city).getCurrency();
