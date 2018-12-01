@@ -37,8 +37,11 @@
       <ComboBox fx:id="languageChooserComboBox" onAction="#languageChooser" promptText="choose language" GridPane.halignment="CENTER" GridPane.rowIndex="3" >
       </ComboBox>
       <Button mnemonicParsing="false" onAction="#resetButton" text="reset" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
-      <Button mnemonicParsing="false" onAction="#showDictionaryButton" text="show dictionary" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
-      <Button mnemonicParsing="false" onAction="#loadDictionaryButton" text="load dictionary to memory" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
+       <HBox GridPane.rowIndex="5" alignment="CENTER">
+            <Button mnemonicParsing="false" onAction="#showDictionaryButton" text="show term dictionary"/>
+            <Button mnemonicParsing="false" onAction="#showCityDictionaryButton" text="show city dictionary"/>
+       </HBox>
+       <Button mnemonicParsing="false" onAction="#loadDictionaryButton" text="load dictionary to memory" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
        <Button mnemonicParsing="false" onAction="#start" text="start" GridPane.halignment="CENTER" GridPane.rowIndex="7" />
    </children>
 </GridPane>

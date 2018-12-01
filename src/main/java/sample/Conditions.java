@@ -27,20 +27,31 @@ public class Conditions {
     }
 
     public String parseNumber(String number){
-        boolean isNumWithDot = number.matches("[0-9]+\\.[0-9]+");
-        number = getFixnum(number, isNumWithDot);
-        if (number.matches("\\d{1,3}\\,\\d\\d\\d")) {
-            //10,123 ->10.123K
-            number = getFix2(number);
-        } else if (number.matches("\\d{1,3}\\,\\d\\d\\d\\,\\d\\d\\d")) {
-            //10,123,000 ->10.123M
-            String[] parts = number.split(",");
-            parts[2] = parts[2].replaceAll("0*$", "");
-            if (parts[2].equals(""))
-                parts[1] = parts[1].replaceAll("0*$", "");
-            number = parts[0] + (!parts[1].equals("") ? "." + parts[1] : parts[1]) + parts[2] + "M";
-        } else {
-            number = getFix3(number);
+        boolean isPsik = number.contains(",");
+
+        if(!isPsik) {
+            String[] parts = number.split("\\.");
+            if (parts[0].length() > 3 && parts[0].length() <= 6) //1010.56 -> 1.01056K
+                number = parts[0].substring(0, parts[0].length() - 3) + "." + parts[0].substring(parts[0].length() - 3) + (parts.length == 2 ? parts[1] : "") + "K";
+            else if (parts[0].length() > 6 && parts[0].length() <= 9)
+                number = parts[0].substring(0, parts[0].length() - 6) + "." + parts[0].substring(parts[0].length() - 6) + (parts.length == 2 ? parts[1] : "") + "M";
+            else if (parts[0].length() > 9 && parts[0].length() <= 12)
+                number = parts[0].substring(0, parts[0].length() - 9) + "." + parts[0].substring(parts[0].length() - 9) + (parts.length == 2 ? parts[1] : "") + "B";
+        }
+        else {
+            if (number.matches("\\d{1,3}\\,\\d\\d\\d")) {
+                //10,123 ->10.123K
+                number = getFix2(number);
+            } else if (number.matches("\\d{1,3}\\,\\d\\d\\d\\,\\d\\d\\d")) {
+                //10,123,000 ->10.123M
+                String[] parts = number.split(",");
+                parts[2] = parts[2].replaceAll("0*$", "");
+                if (parts[2].equals(""))
+                    parts[1] = parts[1].replaceAll("0*$", "");
+                number = parts[0] + (!parts[1].equals("") ? "." + parts[1] : parts[1]) + parts[2] + "M";
+            } else {
+                number = getFix3(number);
+            }
         }
         return number;
     }
@@ -67,7 +78,7 @@ public class Conditions {
         return number;
     }
 
-    static String getFixnum(String number, boolean isNumWithDot) {
+    /*static String getFixnum(String number, boolean isNumWithDot) {
         if (isNumWithDot) {
             String[] parts = number.split("\\.");
             if (parts[0].length() > 3 && parts[0].length() <= 6) //1010.56 -> 1.01056K
@@ -78,5 +89,5 @@ public class Conditions {
                 number = parts[0].substring(0, parts[0].length() - 9) + "." + parts[0].substring(parts[0].length() - 9) + parts[1] + "B";
         }
         return number;
-    }
+    }*/
 }
