@@ -141,9 +141,16 @@ public class Indexer {
         ArrayList<String> sortList=a();
         Map<Character, ArrayList<String>>Finalsort=b(sortList);
         PrintWriter out=null;
+        FileWriter fos=null;
         for(Character x : Finalsort.keySet()) {
+            Character character=x;
+            if(character=='"'||character==' '||character=='?')
+                file=new File(path+"\\"+"rest"+".txt");
+            else
                 file = new File(path + "\\" + x + ".txt");
-                /*
+
+
+            /*
             else if (term.toCharArray()[0]=='$')
                 file = new File(path + "\\" + "$" + ".txt");
             else if (term.toCharArray()[0]=='0')
@@ -171,21 +178,29 @@ public class Indexer {
             */
             sortList.clear();
             sortList = Finalsort.get(x);
-             out = null;
             for (String term : sortList) {
                 list = tmpPosting.get(term);
-                FileWriter fos = new FileWriter(file, true);
+                 fos = new FileWriter(file, true);
                 out = new PrintWriter(fos, true);
                 String t = "";
                 for (PostEntry post : list.values())
                     t = t + post.toString() + ", ";
                 out.println(term + " " + t);
+
             }
-            if(out!=null)
+            if (out!=null)
+                fos.flush();
                 out.close();
+                out = null;
+                System.gc();
+            if (fos!=null) {
+                fos.close();
+                fos=null;
+            }
+            // if(out!=null)
+            //    out.close();
         }
-        if(out!=null)
-            out.close();
+            //out.close();
         tmpPosting.clear();
     }
     public ArrayList<String> a() {

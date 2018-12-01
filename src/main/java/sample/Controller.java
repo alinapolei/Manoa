@@ -17,6 +17,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
 
+import javax.tools.JavaFileManager;
 import java.io.*;
 import java.util.*;
 
@@ -91,9 +92,11 @@ public class Controller {
                 Main.indexer.getDic().clear();
                 Main.allDocs.clear();//?
                 Main.cityIndexer.clear();//?
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
         }
     }
 
