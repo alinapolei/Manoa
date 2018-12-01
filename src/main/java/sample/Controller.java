@@ -20,6 +20,8 @@ import org.apache.commons.io.FileUtils;
 import javax.tools.JavaFileManager;
 import java.io.*;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Controller {
     @FXML
@@ -180,6 +182,52 @@ public class Controller {
             catch (Exception e){
                 e.printStackTrace();
             }
+        }
+    }
+
+    public void showCityDictionaryButton(ActionEvent actionEvent) {
+        if(Main.cityIndexer != null && Main.cityIndexer.values() != null) {
+            TableView<City> table = new TableView<>();
+            TableColumn<City, String> cityCol = new TableColumn<>("City");
+            TableColumn<City, String> currencyCol = new TableColumn<>("Currency");
+            TableColumn<City, String> populationCol = new TableColumn<>("Population");
+            // Defines how to fill data for each cell.
+            cityCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+            currencyCol.setCellValueFactory(new PropertyValueFactory<>("Currency"));
+            populationCol.setCellValueFactory(new PropertyValueFactory<>("pop"));
+
+            // Set Sort type for userName column
+            cityCol.setSortType(TableColumn.SortType.ASCENDING);
+            //tfCorpusCol.setSortType(TableColumn.);
+
+            // Display row data
+            Map<String, Long> result = Main.cityIndexer.values().stream().collect(
+                            Collectors.groupingBy(City::getName, Collectors.counting()));
+            List list = new ArrayList(Main.cityIndexer.values());
+            Collections.sort(list, new Comparator<City>() {
+                @Override
+                public int compare(City o1, City o2) {
+                    return o1.getName().compareTo(o2.getName());
+                }
+            });
+            table.setItems(FXCollections.observableList(list));
+            table.getColumns().addAll(cityCol, currencyCol, populationCol);
+
+            StackPane root = new StackPane();
+            root.setPadding(new Insets(5));
+            root.getChildren().add(table);
+            Stage stage = new Stage();
+            stage.setTitle("Cuty Dictionary");
+            Scene scene = new Scene(root, 300, 400);
+            stage.setScene(scene);
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(corpusPath.getScene().getWindow());
+            stage.show();
+        }
+        else{
+            Alert alert=new Alert(Alert.AlertType.INFORMATION);
+            alert.setContentText("You must hit before the start button");
+            alert.showAndWait();
         }
     }
 
