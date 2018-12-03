@@ -41,28 +41,18 @@ public class Doc {
         }
         if (city!=("")&&city.compareTo("\n")!=0) {
             if(!Main.CityStorage.containsKey(city)) {
-                HttpResponse<JsonNode> response = Unirest.get("http://getcitydetails.geobytes.com/GetCityDetails?fqcn=" + city.toLowerCase())
-                        .header("X-Mashape-Key", "<required>")
-                        .header("Accept", "application/json")
-                        .asJson();
-                Object map = (response.getBody().getArray().get(0));
-                String cur = ((JSONObject) map).get("geobytescurrency").toString();
-                String Cuntry = ((JSONObject) map).get("geobytescountry").toString();
-                String pop = ((JSONObject) map).get("geobytespopulation").toString();
-                Conditions con = new Conditions();
-                pop = con.parseNumber(pop);
-                String CapitalCity=((JSONObject) map).get("geobytescapital").toString();
-                Main.cityIndexer.put(docNumber, new City(city, cur, pop, docNumber));
-                Main.CityStorage.put(city,new City(city,cur,pop,""));
-                if(city.compareTo(CapitalCity)==0)
-                    Main.Capital.add(CapitalCity);
-                Main.Country.add(Cuntry);
+                Main.cityIndexer.put(docNumber,new City(city,"","","",docNumber));
+                Main.nonCapital.add(city);
             }
             else {
                 String cur = Main.CityStorage.get(city).getCurrency();
                 String pop = Main.CityStorage.get(city).getPop();
-                Main.cityIndexer.put(docNumber,new City(city,cur,pop,docNumber));
+                String country=Main.CityStorage.get(city).getCountry();
+                Main.cityIndexer.put(docNumber,new City(city,cur,pop,country,docNumber));
+                Main.Capital.add(city);
+                Main.Country.add(country);
             }
+
 
         }
     }

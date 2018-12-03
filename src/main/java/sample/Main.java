@@ -31,5 +31,6 @@ public class Main extends Application {
     public static HashMap<String,City>CityStorage=new HashMap<>();
     public static Set<String>Country =new HashSet<>();
     public static Set<String>Capital =new HashSet<>();
+    public static Set<String>nonCapital=new HashSet<>();
 
 }

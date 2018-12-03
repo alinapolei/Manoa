@@ -59,13 +59,16 @@ public class Parse {
                                 //String word = tokens[i].replace("\"", "");
                                 //word(word, isStem, doc, isTitle, i);
                                 tok = tok + " " + tokens[i];
+                                tokens[i] = tokens[i].replace("\"", "");
                             }
+
+                            tok = tok.replace("\"", "");
+                            Main.indexer.setDic(tok, doc, isTitle);
+                            i=c;
+                            tok = cc;
                         }
                         tok = tok.replace("\"", "");
                         if (tok.equals("") || tok.equals(" ")) continue;
-                        Main.indexer.setDic(tok, doc, isTitle);
-                        i=c;
-                        tok = cc;
                     } else if (tok.contains("-")) {
                         Main.indexer.setDic(tok, doc, isTitle);
                         //terms.add(tok);
@@ -239,16 +242,17 @@ public class Parse {
         while (tok.length() > 0 && ((!Character.isLetter(tok.charAt(0)) && !Character.isDigit(tok.charAt(0))) || tok.startsWith("\n")) && !tok.equals("") && !tok.startsWith("$") && !tok.startsWith("\""))
             tok = tok.substring(1);
         //while ((!tok.matches(".*\\w$") || tok.endsWith("\n")) && !tok.endsWith("%") && !tok.endsWith("$") && !tok.equals("") && !tok.startsWith("\""))
-        while (tok.length() > 0 && ((!Character.isLetter(tok.charAt(tok.length() - 1)) && !Character.isDigit(tok.charAt(tok.length() - 1))) || tok.endsWith("\n") || tok.endsWith("'s")) && !tok.endsWith("%") && !tok.endsWith("$") && !tok.equals(""))
+        while (tok.length() > 0 && ((!Character.isLetter(tok.charAt(tok.length() - 1)) && !Character.isDigit(tok.charAt(tok.length() - 1))) || tok.endsWith("\n") || tok.endsWith("'s")) && !tok.endsWith("%") && !tok.endsWith("$") && !tok.equals("")&& !tok.endsWith("\""))
             tok = tok.substring(0, tok.length() - 1);
 
         return tok;
     }
     private void word(String tok, boolean isStem, Doc doc, boolean isTitle, int i){
+        tok.replace("\"", "");
         tok = cleanTok(tok);
 
         if(doc.getCity()!="" && tok.toUpperCase().equals(doc.getCity())){
-            Main.cityIndexer.get(doc.getDocNumber()).getDocplace().add(i);
+            Main.cityIndexer.get(doc.getDocNumber()).getDocplace().add(1);
         }
         if(!tok.equals("")) {
             if (isStem)

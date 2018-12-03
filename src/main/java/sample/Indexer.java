@@ -2,6 +2,8 @@ package sample;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class Indexer {
@@ -124,6 +126,7 @@ public class Indexer {
         for (int i = 0; i < stopWords.size(); i++) {
             Main.indexer.getDic().remove(stopWords.toArray()[i]);
             String tmp = Character.toUpperCase((stopWords.toArray()[i]).toString().toCharArray()[0]) + (stopWords.toArray()[i]).toString().substring(1).toLowerCase();
+            Main.indexer.getDic().remove(tmp);
             Main.indexer.getMixTerms().remove(tmp);
             Main.indexer.getUpTerms().remove(stopWords.toArray()[i].toString().toUpperCase());
             Main.indexer.getLowTerms().remove(stopWords.toArray()[i].toString().toLowerCase());
@@ -142,29 +145,39 @@ public class Indexer {
         Map<Character, ArrayList<String>>Finalsort=b(sortList);
         PrintWriter out=null;
         FileWriter fos=null;
-        for(Character x : Finalsort.keySet()) {
-            Character character=x;
-            /*if(character=='"'||character==' '||character=='?')
-                file=new File(path+"\\"+"rest"+".txt");
-            else
-                file = new File(path + "\\" + x + ".txt");
-*/
-            if(!Character.isDigit(x.charValue()) && !Character.isLetter(x.charValue()) && character!='$')
-                file=new File(path+"\\"+"rest"+".txt");
-            else
-                file = new File(path + "\\" + x + ".txt");
-            sortList.clear();
-            sortList = Finalsort.get(x);
-            for (String term : sortList) {
-                list = tmpPosting.get(term);
-                 fos = new FileWriter(file, true);
-                out = new PrintWriter(fos, true);
-                String t = "";
-                for (PostEntry post : list.values())
-                    t = t + post.toString() + ", ";
-                out.println(term + " " + t);
+        ExecutorService executor = Executors.newFixedThreadPool(6);
 
-            }
+        for(Character x : Finalsort.keySet()) {
+            executor.execute(new Thread() {
+                public  void run() {
+                    Character character = x;
+                    File file;
+                    ArrayList<String> sortList=a();
+                    HashMap<String, PostEntry> list;
+                    PrintWriter out=null;
+                    FileWriter fos=null;
+
+                    if (!Character.isDigit(x.charValue()) && !Character.isLetter(x.charValue()) && character != '$')
+                        file = new File(path + "\\" + "rest" + ".txt");
+                    else
+                        file = new File(path + "\\" + x + ".txt");
+                    sortList.clear();
+                    sortList = Finalsort.get(x);
+                    for (
+                            String term : sortList) {
+                        list = tmpPosting.get(term);
+                        try {
+                            fos = new FileWriter(file, true);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        out = new PrintWriter(fos, true);
+                        String t = "";
+                        for (PostEntry post : list.values())
+                            t = t + post.toString() + ", ";
+                        out.println(term + " " + t);
+
+                    }
             /*
             if (out!=null)
                 fos.flush();
@@ -172,7 +185,12 @@ public class Indexer {
                 out = null;
                 System.gc();
                 fos=null;
-*/
+                */
+                }
+            });
+        }
+        executor.shutdown();
+        while (!executor.isTerminated()) {
         }
         tmpPosting.clear();
     }

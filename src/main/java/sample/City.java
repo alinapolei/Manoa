@@ -7,6 +7,7 @@ public class City {
     private String name;
     private String Currency;
     private String pop;
+    private String Country;
     private ArrayList<Integer> docplace;
 
 
@@ -20,13 +21,23 @@ public class City {
 
 
 
-    public City(String name, String currency, String pop,String doc) {
+    public City(String name, String currency, String pop,String country,String doc) {
         this.doc=doc;
         this.name = name;
         Currency = currency;
         this.pop = pop;
         docplace=new ArrayList<>();
+        this.Country=country;
     }
+
+    public String getCountry() {
+        return Country;
+    }
+
+    public void setCountry(String country) {
+        Country = country;
+    }
+
     public String getDoc() {
         return doc;
     }

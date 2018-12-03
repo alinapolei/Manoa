@@ -1,5 +1,8 @@
 package sample;
 
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -16,6 +19,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
+import org.json.JSONArray;
 
 import javax.tools.JavaFileManager;
 import java.io.*;
@@ -253,6 +257,20 @@ public class Controller {
                 if (! directory.exists())
                     directory.mkdir();
 
+                HttpResponse<JsonNode> response = Unirest.get("https://restcountries.eu/rest/v2/all")
+                        .header("X-Mashape-Key", "<required>")
+                        .header("Accept", "application/json")
+                        .asJson();
+                Object map = (response.getBody().getArray());
+               for (int i=0;i<((JSONArray) map).length();i++)
+               {
+                   String countryName=((JSONArray) map).getJSONObject(i).get("name").toString().toUpperCase();
+                   String CapitalName=((JSONArray) map).getJSONObject(i).get("capital").toString().toUpperCase();
+                   String Currency =((JSONArray) map).getJSONObject(i).get("currencies").toString().toUpperCase();
+                   String Pop=((JSONArray) map).getJSONObject(i).get("population").toString().toUpperCase();
+                   Main.CityStorage.put(CapitalName,new City(CapitalName,Currency,Pop,countryName,""));
+               }
+
                 Main.allDocs = new HashMap<>();
                 List<File> allFiles = new ArrayList<File>();
                 getAllFiles(corpusPathString+ "\\corpus", allFiles);
@@ -295,8 +313,8 @@ public class Controller {
                                         + "num of terms: " + Main.indexer.getDic().size() + "\n"
                                         +  "num of County: "+ Main.Country.size() +"\n"
                                         +   "num of capital city: "+Main.Capital.size()+"\n"
-                                         +"num of non capital: "+(Main.CityStorage.size()-Main.Capital.size())+"\n"
-                                        +"num of all city: "+Main.CityStorage.size()+"\n"
+                                         +"num of non capital: "+(Main.nonCapital.size())+"\n"
+                                        +"num of all city: "+(Main.nonCapital.size()+Main.Capital.size())+"\n"
                                         +"max insance of city : "+maxCity.getDoc()+" "+maxCity.getName()+" "+maxCity.getDocplace().toString() +"\n"
                                          + "runtime: " + timeSum);
                 alert.showAndWait();
@@ -308,7 +326,7 @@ public class Controller {
     }
 
     private City maxCityTerm() {
-        City city = new City(" "," "," "," ");
+        City city = new City(" "," "," "," "," ");
         for (City x :Main.cityIndexer.values()){
             if(city.getDocplace().size()<x.getDocplace().size())
                 city = x;
