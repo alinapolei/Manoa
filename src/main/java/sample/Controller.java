@@ -272,7 +272,7 @@ public class Controller {
                }
 
                 Main.allDocs = new HashMap<>();
-                List<File> allFiles = new ArrayList<File>();
+                Queue<File> allFiles = new ArrayDeque<>();
                 getAllFiles(corpusPathString+ "\\corpus", allFiles);
                 ReadFile readFile = new ReadFile();
                 readFile.setStopWords(Main.stopWords, corpusPathString + "\\stop_words.txt");
@@ -281,25 +281,30 @@ public class Controller {
                 //HashSet<Doc> docs = new HashSet<>();
                 long start = System.nanoTime();
                 int counter = 0;
-                for (File file : allFiles) {
+                //for (File file : allFiles) {
+                    while(!allFiles.isEmpty()){
+                        File file=allFiles.poll();
+                    long start1 = System.nanoTime();
+                    Queue<Doc> docs = new ArrayDeque<>();
+                    readFile.separateDocuments(file, docs);
+                    parse.doParse(docs, isStemCheckbox.isSelected());
+                    System.out.println("[+] doneParseDoc " + file.getName());
+                    for(Doc doc: docs)
+                        Main.allDocs.put(doc.getDocNumber(),doc);
+
                     counter++;
-                    if(counter == 200) {
+                    if(counter == 303) {
                         System.out.println("[+]Transfer To Disk");
                         parse.transferDisk(postingpath);
                         writeToDisk(Main.cityIndexer, postingpath);
                         counter = 0;
                     }
 
-                    long start1 = System.nanoTime();
-                    HashSet<Doc> docs = new HashSet<>();
-                    readFile.separateDocuments(file, docs);
-                    parse.doParse(docs, isStemCheckbox.isSelected());
-                    System.out.println("[+] doneParseDoc " + file.getName());
 
-                    for(Doc doc: docs)
-                        Main.allDocs.put(doc.getDocNumber(),doc);
                     docs.clear();
                     System.out.println("sum: " + (System.nanoTime() - start1) * Math.pow(10, -9));
+
+
                 }
                 writeToDisk(Main.cityIndexer, postingpath);
                 parse.transferDisk(postingpath);
@@ -334,7 +339,7 @@ public class Controller {
             return city;
     }
 
-    private void getAllFiles(String path, List<File> allFiles) {
+    private void getAllFiles(String path, Queue<File> allFiles) {
         File directory = new File(path);
         File[] fileList = directory.listFiles();
         if (fileList != null) {

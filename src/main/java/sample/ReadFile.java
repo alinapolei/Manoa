@@ -14,7 +14,7 @@ public class ReadFile {
     public ReadFile() {
     }
 
-    public void separateDocuments(File file, HashSet<Doc> hashSet) throws Exception {
+    public void separateDocuments(File file, Queue<Doc> hashSet) throws Exception {
             try {
                 int i=0;
                 Document doc = Jsoup.parse(file, "utf-8");

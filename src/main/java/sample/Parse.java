@@ -15,14 +15,14 @@ public class Parse {
     //Indexer index;
     Conditions con = new Conditions();
     String[] tokens;
-    HashSet<Doc> docs;
+    Queue<Doc> docs;
 
     public Parse() {
         //docs is the documents after readFile separate them all
         //index =new Indexer();
     }
 
-    public void doParse(HashSet<Doc> dc, boolean isStem) {
+    public void doParse(Queue<Doc> dc, boolean isStem) {
         docs = dc;
         dateFormatSymbols = new DateFormatSymbols(new Locale("en", "US"));
         months = Arrays.asList(dateFormatSymbols.getMonths());
@@ -30,7 +30,9 @@ public class Parse {
         shortMonths = Arrays.asList(dateFormatSymbols.getShortMonths());
         shortMonths.replaceAll(String::toLowerCase);
         stemmer = new Stemmer();
-        for (Doc doc : docs) {
+        //for (Doc doc : docs) {
+          while(!docs.isEmpty()){
+              Doc doc=docs.poll();
             String[] docParts = doc.docToString();
             for (int j=0; j<docParts.length; j++) {
                 String part = docParts[j];

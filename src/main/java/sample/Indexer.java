@@ -141,21 +141,21 @@ public class Indexer {
         System.out.println("[+]Finish setall Terms");
         HashMap<String, PostEntry> list;
         File file;
-        ArrayList<String> sortList=a();
-        Map<Character, ArrayList<String>>Finalsort=b(sortList);
+        ArrayList<String> sortList=sortTempPosting();
+        Map<Character, ArrayList<String>>Finalsort=finishSort(sortList);
         PrintWriter out=null;
         FileWriter fos=null;
-        ExecutorService executor = Executors.newFixedThreadPool(6);
+       // ExecutorService executor = Executors.newFixedThreadPool(6);
 
         for(Character x : Finalsort.keySet()) {
-            executor.execute(new Thread() {
-                public  void run() {
+         //   executor.execute(new Thread() {
+              //  public  void run() {
                     Character character = x;
-                    File file;
-                    ArrayList<String> sortList=a();
-                    HashMap<String, PostEntry> list;
-                    PrintWriter out=null;
-                    FileWriter fos=null;
+                  //  File file;
+                  //  ArrayList<String> sortList=a();
+                  //  HashMap<String, PostEntry> list;
+                  //  PrintWriter out=null;
+                  //  FileWriter fos=null;
 
                     if (!Character.isDigit(x.charValue()) && !Character.isLetter(x.charValue()) && character != '$')
                         file = new File(path + "\\" + "rest" + ".txt");
@@ -187,20 +187,20 @@ public class Indexer {
                 fos=null;
                 */
                 }
-            });
-        }
-        executor.shutdown();
-        while (!executor.isTerminated()) {
-        }
+         //   });
+      //  }
+      //  executor.shutdown();
+     //   while (!executor.isTerminated()) {
+     //   }
         tmpPosting.clear();
     }
-    public ArrayList<String> a() {
+    private ArrayList<String> sortTempPosting() {
         ArrayList<String> sortedKeys =
                 new ArrayList<String>(tmpPosting.keySet());
         Collections.sort(sortedKeys);
         return sortedKeys;
     }
-    public Map<Character, ArrayList<String>> b(ArrayList<String>sortList){
+    private Map<Character, ArrayList<String>> finishSort(ArrayList<String>sortList){
         Map <Character,ArrayList<String>> MapAlpha=new HashMap<>();
         for(String x :sortList){
             Character tmp= Character.toLowerCase(x.toCharArray()[0]);
