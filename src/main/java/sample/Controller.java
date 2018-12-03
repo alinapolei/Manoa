@@ -284,21 +284,22 @@ public class Controller {
                 //for (File file : allFiles) {
                     while(!allFiles.isEmpty()){
                         File file=allFiles.poll();
-                    long start1 = System.nanoTime();
+                        counter++;
+                        if(counter == 303) {
+                            System.out.println("[+]Transfer To Disk");
+                            parse.transferDisk(postingpath);
+                            writeToDisk(Main.cityIndexer, postingpath);
+                            counter = 0;
+                        }
+
+                        long start1 = System.nanoTime();
                     Queue<Doc> docs = new ArrayDeque<>();
                     readFile.separateDocuments(file, docs);
                     parse.doParse(docs, isStemCheckbox.isSelected());
                     System.out.println("[+] doneParseDoc " + file.getName());
-                    for(Doc doc: docs)
-                        Main.allDocs.put(doc.getDocNumber(),doc);
+                  //  for(Doc doc: docs)
+                     //   Main.allDocs.put(doc.getDocNumber(),doc);
 
-                    counter++;
-                    if(counter == 303) {
-                        System.out.println("[+]Transfer To Disk");
-                        parse.transferDisk(postingpath);
-                        writeToDisk(Main.cityIndexer, postingpath);
-                        counter = 0;
-                    }
 
 
                     docs.clear();

@@ -172,9 +172,10 @@ public class Indexer {
                             e.printStackTrace();
                         }
                         out = new PrintWriter(fos, true);
-                        String t = "";
+                        StringBuilder t=new StringBuilder();
                         for (PostEntry post : list.values())
-                            t = t + post.toString() + ", ";
+                            t.append(post.toString()+", ");
+                            //t = t + post.toString() + ", ";
                         out.println(term + " " + t);
 
                     }
@@ -202,14 +203,15 @@ public class Indexer {
     }
     private Map<Character, ArrayList<String>> finishSort(ArrayList<String>sortList){
         Map <Character,ArrayList<String>> MapAlpha=new HashMap<>();
-        for(String x :sortList){
-            Character tmp= Character.toLowerCase(x.toCharArray()[0]);
-            if(!MapAlpha.containsKey(tmp)) {
-                MapAlpha.put(tmp, new ArrayList<>());
-                MapAlpha.get(tmp).add(x);
+        for(String x :sortList) {
+            if (x.compareTo("") != 0) {
+                Character tmp = Character.toLowerCase(x.toCharArray()[0]);
+                if (!MapAlpha.containsKey(tmp)) {
+                    MapAlpha.put(tmp, new ArrayList<>());
+                    MapAlpha.get(tmp).add(x);
+                } else
+                    MapAlpha.get(tmp).add(x);
             }
-            else
-                MapAlpha.get(tmp).add(x);
         }
         return MapAlpha;
     }
