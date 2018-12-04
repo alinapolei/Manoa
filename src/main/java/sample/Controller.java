@@ -5,12 +5,9 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.geometry.NodeOrientation;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -21,10 +18,8 @@ import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 
-import javax.tools.JavaFileManager;
 import java.io.*;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Controller {
@@ -270,6 +265,8 @@ public class Controller {
                    String Pop=((JSONArray) map).getJSONObject(i).get("population").toString().toUpperCase();
                    Main.CityStorage.put(CapitalName,new City(CapitalName,Currency,Pop,countryName,""));
                }
+                response=null;
+                map=null;
 
                 Main.allDocs = new HashMap<>();
                 Queue<File> allFiles = new ArrayDeque<>();
@@ -288,8 +285,9 @@ public class Controller {
                         if(counter == 150) {
                             System.out.println("[+]Transfer To Disk");
                             parse.transferDisk(postingpath);
-                            //Main.indexer.transferDocsData(new HashSet<Doc>(Main.allDocs.values()), postingpath);
-                            //Main.allDocs.clear();
+                            Main.indexer.transferDocsData(new HashSet<Doc>(Main.allDocs.values()), postingpath);
+                            Main.numofAlldocs=Main.numofAlldocs+Main.allDocs.size();
+                            Main.allDocs.clear();
                             writeToDisk(Main.cityIndexer, postingpath);
                             counter = 0;
                         }
@@ -302,8 +300,6 @@ public class Controller {
                   //  for(Doc doc: docs)
                      //   Main.allDocs.put(doc.getDocNumber(),doc);
 
-
-
                     docs.clear();
                     System.out.println("sum: " + (System.nanoTime() - start1) * Math.pow(10, -9));
 
@@ -312,14 +308,16 @@ public class Controller {
                 writeToDisk(Main.cityIndexer, postingpath);
                 parse.transferDisk(postingpath);
                 Main.indexer.transferDocsData(new HashSet<Doc>(Main.allDocs.values()), postingpath);
+                Main.numofAlldocs=Main.numofAlldocs+Main.allDocs.size();
+                Main.allDocs.clear();
                 double timeSum = (System.nanoTime() - start) * Math.pow(10, -9);
                 System.out.println("sum: " + (System.nanoTime() - start) * Math.pow(10, -9));
                 City maxCity=maxCityTerm();
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setHeaderText("Finished successfully to retrieve files");
-                alert.setContentText("num of documents: " + Main.allDocs.size() + "\n"
+                alert.setContentText("num of documents: " +Main.numofAlldocs+ "\n"
                                         + "num of terms: " + Main.indexer.getDic().size() + "\n"
-                                        +  "num of County: "+ Main.Country.size() +"\n"
+                                        +  "num of County: "+ Main.Capital.size() +"\n"
                                         +   "num of capital city: "+Main.Capital.size()+"\n"
                                          +"num of non capital: "+(Main.nonCapital.size())+"\n"
                                         +"num of all city: "+(Main.nonCapital.size()+Main.Capital.size())+"\n"

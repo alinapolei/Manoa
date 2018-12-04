@@ -11,14 +11,6 @@ public class City {
     private ArrayList<Integer> docplace;
 
 
-    public ArrayList<Integer> getDocplace() {
-        return docplace;
-    }
-
-    public void setDocplace(Integer index) {
-        docplace.add(index);
-    }
-
 
 
     public City(String name, String currency, String pop,String country,String doc) {
@@ -26,9 +18,20 @@ public class City {
         this.name = name;
         Currency = currency;
         this.pop = pop;
-        docplace=new ArrayList<>();
+        //docplace=new ArrayList<>();
         this.Country=country;
     }
+
+    public ArrayList<Integer> getDocplace() {
+        if (docplace==null)
+            docplace=new ArrayList<>();
+        return docplace;
+    }
+
+    public void setDocplace(Integer index) {
+        docplace.add(index);
+    }
+
 
     public String getCountry() {
         return Country;
@@ -73,6 +76,8 @@ public class City {
 
     @Override
     public String toString() {
+        if (docplace==null)
+            return name + " " +doc+" "+"[]";
         return name + " " +doc+" "+docplace.toString();
     }
 }

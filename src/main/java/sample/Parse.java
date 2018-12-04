@@ -13,9 +13,9 @@ public class Parse {
     List<String> shortMonths;
     Stemmer stemmer;
     //Indexer index;
-    Conditions con = new Conditions();
+    //Conditions con = new Conditions();
     String [] tokens;
-    Queue<Doc> docs;
+   // Queue<Doc> docs;
 
     public Parse() {
         //docs is the documents after readFile separate them all
@@ -23,16 +23,16 @@ public class Parse {
     }
 
     public void doParse(Queue<Doc> dc, boolean isStem) {
-        docs = dc;
+        //docs = dc;
         dateFormatSymbols = new DateFormatSymbols(new Locale("en", "US"));
         months = Arrays.asList(dateFormatSymbols.getMonths());
         months.replaceAll(String::toLowerCase);
         shortMonths = Arrays.asList(dateFormatSymbols.getShortMonths());
         shortMonths.replaceAll(String::toLowerCase);
         stemmer = new Stemmer();
-        //for (Doc doc : docs) {
-          while(!docs.isEmpty()){
-              Doc doc=docs.poll();
+        //for (Doc doc : dc) {
+          while(!dc.isEmpty()){
+              Doc doc=dc.poll();
               Main.allDocs.put(doc.getDocNumber(),doc);
 
               String[] docParts = doc.docToString();
@@ -80,7 +80,7 @@ public class Parse {
                         //terms.add(tok);
                         continue;
                     } else {
-                        if (con.isAlpha(tok.toString())) {
+                        if (Main.con.isAlpha(tok.toString())) {
                             //------put here stop words and parse for words
                             if (tok.toString().equals("between") && i + 3 < tokens.length && tokens[i + 2].equals("and")) {
                                 tok.append( tokens[i + 1] + tokens[i + 2] + tokens[i + 3]);
@@ -128,7 +128,7 @@ public class Parse {
                                 tokens[i + 3] = "";
                             }
                             boolean isNumWithDot = tok.toString().matches("[0-9]+\\.[0-9]+");
-                            boolean isNum = con.isNum(tok.toString());
+                            boolean isNum = Main.con.isNum(tok.toString());
                             if ((isNum || isNumWithDot)) {
                                 if (i + 1 < tokens.length) {
                                     //number + Thousand/Million/Billion/Trillion
@@ -266,8 +266,8 @@ public class Parse {
         if(!tok.equals("")) {
             if (isStem)
                 tok = stemmer.stem(tok);
-            String tmp = Character.toUpperCase(tok.toCharArray()[0]) + (tok.substring(1).toLowerCase());
-            if (tok.equals(tmp))
+            //String tmp = Character.toUpperCase(tok.toCharArray()[0]) + (tok.substring(1).toLowerCase());
+            if (tok.equals(Character.toUpperCase(tok.toCharArray()[0]) + (tok.substring(1).toLowerCase())))
                 Main.indexer.setMixedTerms(tok, doc, isTitle);
                 //mixterms.add(tmp);
             else if (tok.equals(tok.toLowerCase()))

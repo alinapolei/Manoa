@@ -2,8 +2,7 @@ package sample;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
 
 
 public class Indexer {
@@ -13,7 +12,7 @@ public class Indexer {
     private Map<String, DicEntry> upTerms;
     private Map<String, DicEntry> mixTerms;
     private Map<String, HashMap<String, PostEntry>> tmpPosting;
-    Conditions con;
+   // Conditions con;
 
 
 
@@ -23,7 +22,7 @@ public class Indexer {
         upTerms = Collections.synchronizedMap(new HashMap<>());
         mixTerms = Collections.synchronizedMap(new HashMap<>());
         tmpPosting = Collections.synchronizedMap(new HashMap<>());
-        con = new Conditions();
+       // con = new Conditions();
     }
 
     public void setDic(String term,Doc doc, boolean isTitle) {

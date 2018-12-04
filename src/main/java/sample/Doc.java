@@ -19,7 +19,7 @@ public class Doc {
     private String city="";
     private int maxtf;
     private int numOfWords;
-
+    //private Conditions con;
 
     public String getCity() {
         return city;
@@ -45,12 +45,13 @@ public class Doc {
                 Main.nonCapital.add(city);
             }
             else {
-                String cur = Main.CityStorage.get(city).getCurrency();
-                String pop = Main.CityStorage.get(city).getPop();
-                String country=Main.CityStorage.get(city).getCountry();
-                Main.cityIndexer.put(docNumber,new City(city,cur,pop,country,docNumber));
+                //con=new Conditions();
+               // String cur = Main.CityStorage.get(city).getCurrency();
+               // String pop = Main.CityStorage.get(city).getPop();
+              //  String country=Main.CityStorage.get(city).getCountry();
+                Main.cityIndexer.put(docNumber,new City(city,Main.CityStorage.get(city).getCurrency(),Main.con.parseNumber(Main.CityStorage.get(city).getPop()),Main.CityStorage.get(city).getCountry(),docNumber));
                 Main.Capital.add(city);
-                Main.Country.add(country);
+                //Main.Country.add(Main.CityStorage.get(city).getCountry());
             }
 
 
