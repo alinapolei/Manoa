@@ -46,11 +46,11 @@ public class Parse {
                     StringBuilder tok = new StringBuilder(tokens[i]);
                     boolean isDollar = false;
                     tok = new StringBuilder(cleanTok(tok.toString()));
-                    if (tok.equals("") || tok.equals(" ")) continue;
+                    if (tok.toString().equals("") || tok.toString().equals(" ")) continue;
                     if (tok.toString().startsWith("\"")) {
                         tok=new StringBuilder( tok.toString().replaceFirst("\"", ""));
                         int c = i;
-                        StringBuilder cc = tok;
+                        StringBuilder cc = new StringBuilder(tok);
                         if (!tok.toString().endsWith("\"")) {
                             //word(tok, isStem, doc, isTitle, i);
                             i++;
@@ -72,7 +72,9 @@ public class Parse {
                             tok = cc;
                         }
                         tok=new StringBuilder(tok.toString().replace("\"", ""));
-                        if (tok.equals("") || tok.equals(" ")) continue;
+                        if (tok.toString().equals("") || tok.toString().equals(" ")) continue;
+                        word(tok.toString(), isStem, doc, isTitle, i);
+                        continue;
                     } else if (tok.toString().contains("-")) {
                         Main.indexer.setDic(tok.toString(), doc, isTitle);
                         //terms.add(tok);
@@ -80,12 +82,12 @@ public class Parse {
                     } else {
                         if (con.isAlpha(tok.toString())) {
                             //------put here stop words and parse for words
-                            if (tok.equals("between") && i + 3 < tokens.length && tokens[i + 2].equals("and")) {
+                            if (tok.toString().equals("between") && i + 3 < tokens.length && tokens[i + 2].equals("and")) {
                                 tok.append( tokens[i + 1] + tokens[i + 2] + tokens[i + 3]);
                                 tokens[i + 1] = "";
                                 tokens[i + 2] = "";
                                 tokens[i + 3] = "";
-                            } else if (!tok.equals("") && i + 1 < tokens.length && !tokens[i + 1].equals("") && StringUtil.isNumeric(tokens[i + 1])
+                            } else if (!tok.toString().equals("") && i + 1 < tokens.length && !tokens[i + 1].equals("") && StringUtil.isNumeric(tokens[i + 1])
                                     && (months.contains(tok.toString().toLowerCase()) || shortMonths.contains(tok.toString().toLowerCase()))) {
                                 SimpleDateFormat simpleDateFormat;
                                 Calendar date = new GregorianCalendar();
@@ -247,10 +249,8 @@ public class Parse {
         }
     }
     private String cleanTok(String tok){
-        //while ((!tok.matches("^\\w.*") || tok.startsWith("\n")) && !tok.equals("") && !tok.startsWith("$") && !tok.startsWith("\""))
         while (tok.length() > 0 && ((!Character.isLetter(tok.charAt(0)) && !Character.isDigit(tok.charAt(0))) || tok.startsWith("\n")) && !tok.equals("") && !tok.startsWith("$") && !tok.startsWith("\""))
             tok = tok.substring(1);
-        //while ((!tok.matches(".*\\w$") || tok.endsWith("\n")) && !tok.endsWith("%") && !tok.endsWith("$") && !tok.equals("") && !tok.startsWith("\""))
         while (tok.length() > 0 && ((!Character.isLetter(tok.charAt(tok.length() - 1)) && !Character.isDigit(tok.charAt(tok.length() - 1))) || tok.endsWith("\n") || tok.endsWith("'s")) && !tok.endsWith("%") && !tok.endsWith("$") && !tok.equals("")&& !tok.endsWith("\""))
             tok = tok.substring(0, tok.length() - 1);
 

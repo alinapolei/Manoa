@@ -285,9 +285,11 @@ public class Controller {
                     while(!allFiles.isEmpty()){
                         File file=allFiles.poll();
                         counter++;
-                        if(counter == 303) {
+                        if(counter == 150) {
                             System.out.println("[+]Transfer To Disk");
                             parse.transferDisk(postingpath);
+                            //Main.indexer.transferDocsData(new HashSet<Doc>(Main.allDocs.values()), postingpath);
+                            //Main.allDocs.clear();
                             writeToDisk(Main.cityIndexer, postingpath);
                             counter = 0;
                         }
