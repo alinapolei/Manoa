@@ -178,6 +178,10 @@ public class Controller {
                     alert.setHeaderText("The dictionary saved successfully");
                     alert.showAndWait();
                     alert.close();
+
+
+
+
                 }
             }
             catch (Exception e){
@@ -284,7 +288,7 @@ public class Controller {
                     while(!allFiles.isEmpty()){
                         File file=allFiles.poll();
                         counter++;
-                        if(counter == 150) {
+                        if(counter == 220) {
                             System.out.println("[+]Transfer To Disk");
                             parse.transferDisk(postingpath);
                             Main.indexer.transferDocsData(new HashSet<Doc>(Main.allDocs.values()), postingpath);
@@ -298,12 +302,12 @@ public class Controller {
                     Queue<Doc> docs = new ArrayDeque<>();
                     readFile.separateDocuments(file, docs);
                     parse.doParse(docs, isStemCheckbox.isSelected());
-                    System.out.println("[+] doneParseDoc " + file.getName());
+                    //System.out.println("[+] doneParseDoc " + file.getName());
                   //  for(Doc doc: docs)
                      //   Main.allDocs.put(doc.getDocNumber(),doc);
 
                     docs.clear();
-                    System.out.println("sum: " + (System.nanoTime() - start1) * Math.pow(10, -9));
+                    //System.out.println("sum: " + (System.nanoTime() - start1) * Math.pow(10, -9));
 
 
                 }
@@ -313,7 +317,7 @@ public class Controller {
                 Main.numofAlldocs=Main.numofAlldocs+Main.allDocs.size();
                 Main.allDocs.clear();
                 double timeSum = (System.nanoTime() - start) * Math.pow(10, -9);
-                System.out.println("sum: " + (System.nanoTime() - start) * Math.pow(10, -9));
+                //System.out.println("sum: " + (System.nanoTime() - start) * Math.pow(10, -9));
                 City maxCity=maxCityTerm();
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setHeaderText("Finished successfully to retrieve files");
