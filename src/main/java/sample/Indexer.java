@@ -339,12 +339,19 @@ public class Indexer {
     }
     public void transferDocsData(HashSet<Doc> allDocs, String path) {
         try {
-            BufferedWriter out = new BufferedWriter(new FileWriter(path + "\\Documents.txt"));
-            Iterator it = allDocs.iterator();
-            while(it.hasNext()) {
-                out.write(it.next().toString());
-                out.newLine();
-            }
+            PrintWriter out=null;
+            FileWriter fos=null;
+            File file=new File(path + "\\Documents.txt");
+            fos=new FileWriter(file,true);
+            out=new PrintWriter(fos,true);
+            for (String post : Main.allDocs.keySet())
+                out.println(Main.allDocs.get(post).toString());
+            //BufferedWriter out = new BufferedWriter(new FileWriter(path + "\\Documents.txt"));
+            //Iterator it = allDocs.iterator();
+            //while(it.hasNext()) {
+              //  out.write(it.next().toString());
+               // out.newLine();
+            //}
             out.close();
         }
         catch(IOException e)
