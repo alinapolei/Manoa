@@ -1,6 +1,10 @@
 package sample;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 
@@ -144,6 +148,7 @@ public class Indexer {
         Map<Character, ArrayList<String>>Finalsort=finishSort(sortList);
         PrintWriter out=null;
         FileWriter fos=null;
+        List<String> list1;
        // ExecutorService executor = Executors.newFixedThreadPool(6);
 
         for(Character x : Finalsort.keySet()) {
@@ -160,24 +165,40 @@ public class Indexer {
                         file = new File(path + "\\" + "rest" + ".txt");
                     else
                         file = new File(path + "\\" + x + ".txt");
+
+                    if(file.exists()) {
+                        //list1.clear();
+                        list1 = Files.readAllLines(Paths.get((file.getPath())));
+                    }
+                    else
+                       list1 =new ArrayList<>();
                     sortList.clear();
                     sortList = Finalsort.get(x);
-                    for (
-                            String term : sortList) {
+                    for (String term : sortList) {
                         list = tmpPosting.get(term);
-                        try {
-                            fos = new FileWriter(file, true);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        out = new PrintWriter(fos, true);
+                       // try {
+                        // fos = new FileWriter(file, true);
+                       // } catch (IOException e) {
+                       //     e.printStackTrace();
+                      //  }
+                       // out = new PrintWriter(fos, true);
                         StringBuilder t=new StringBuilder();
                         for (PostEntry post : list.values())
                             t.append(post.toString()+", ");
                             //t = t + post.toString() + ", ";
-                        out.println(term + " " + t);
-
+                        list1.add(term + " " + t);
+                        //out.println(term + " " + t);
                     }
+                    System.gc();
+                    file.delete();
+                     fos = new FileWriter(file, true);
+                    out = new PrintWriter(fos, true);
+
+            for( String a :list1)
+                     out.println(a);
+                    out.close();
+                    //System.gc();
+                    list1.clear();
             /*
             if (out!=null)
                 fos.flush();

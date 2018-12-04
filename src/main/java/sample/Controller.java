@@ -19,6 +19,8 @@ import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -354,15 +356,26 @@ public class Controller {
     }
 
     private void writeToDisk(Map<String, City> cityIndexer, String path) throws IOException {
+        File file = new File(path+"\\cities.txt");
+        List<String> list;
+        if (file.exists())
+             list = Files.readAllLines(Paths.get((file.getPath())));
+        else
+            list=new ArrayList<>();
+        for (String s:cityIndexer.keySet())
+            list.add(cityIndexer.get(s).toString());
         PrintWriter out = null;
-        for (String term : cityIndexer.keySet()) {
-            City city = cityIndexer.get(term);
-            File file = new File(path+"\\cities.txt");
+        //for (String term : cityIndexer.keySet()) {
+          //  City city = cityIndexer.get(term);
+            file.delete();
             FileWriter fos = new FileWriter(file, true);
             out = new PrintWriter(fos, true);
-            out.println(city.toString());
-        }
-        if(out!=null)
+            for (String string:list)
+                out.println(string);
+            list.clear();
+            //out.println(city.toString());
+        //}
+        //if(out!=null)
             out.close();
     }
 }
