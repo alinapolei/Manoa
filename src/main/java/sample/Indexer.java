@@ -245,7 +245,7 @@ public class Indexer {
                     StringBuilder t=new StringBuilder();
                     for (PostEntry post : list.values())
                         t.append(post.toString()+", ");
-                    list1.add(term + " " + t);
+                    list1.add(term + " ->" + t);
             }
             System.gc();
             file.delete();

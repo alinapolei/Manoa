@@ -17,6 +17,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -39,6 +42,7 @@ public class Controller {
         /**
          * set the languages list
          */
+        /*
         List<String> allLanguages = new ArrayList<>();
         String[] languages = Locale.getISOLanguages();
         for (int i = 0; i < languages.length; i++){
@@ -55,6 +59,7 @@ public class Controller {
                     }
                 });
         languageChooserComboBox.setItems(Languages);
+        */
     }
 
 
@@ -274,6 +279,8 @@ public class Controller {
                 response=null;
                 map=null;
 
+
+
                 Main.allDocs = new HashMap<>();
                 Queue<File> allFiles = new ArrayDeque<>();
                 getAllFiles(corpusPathString+ "\\corpus", allFiles);
@@ -281,6 +288,11 @@ public class Controller {
                 readFile.setStopWords(Main.stopWords, corpusPathString + "\\stop_words.txt");
                 Main.indexer = new Indexer();
                 Parse parse = new Parse();
+
+                fristRun(allFiles);
+                SetLang();
+                getAllFiles(corpusPathString+ "\\corpus", allFiles);
+
                 long start = System.nanoTime();
                 int counter = 0;
                     while(!allFiles.isEmpty()){
@@ -292,7 +304,7 @@ public class Controller {
                             Main.indexer.transferDocsData(new HashSet<Doc>(Main.allDocs.values()), postingpath);
                             Main.numofAlldocs=Main.numofAlldocs+Main.allDocs.size();
                             Main.allDocs.clear();
-                            writeToDisk(Main.cityIndexer, postingpath);
+                            writeToDisk(Main.citycorp, postingpath);
                             counter = 0;
                         }
 
@@ -302,15 +314,15 @@ public class Controller {
                     parse.doParse(docs, isStemCheckbox.isSelected());
                     docs.clear();
                 }
-                writeToDisk(Main.cityIndexer, postingpath);
+                writeToDisk(Main.citycorp, postingpath);
                 parse.transferDisk(postingpath);
                 Main.indexer.transferDocsData(new HashSet<Doc>(Main.allDocs.values()), postingpath);
                 Main.numofAlldocs=Main.numofAlldocs+Main.allDocs.size();
                 Main.allDocs.clear();
                 double timeSum = (System.nanoTime() - start) * Math.pow(10, -9);
                 //System.out.println("sum: " + (System.nanoTime() - start) * Math.pow(10, -9));
-                City maxCity=maxCityTerm();
-                sortAllfiles();
+               // City maxCity=maxCityTerm();
+                sortAllfiles(postingpath);
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setHeaderText("Finished successfully to retrieve files");
                 alert.setContentText("num of documents: " +Main.numofAlldocs+ "\n"
@@ -319,7 +331,7 @@ public class Controller {
                                         +   "num of capital city: "+Main.Capital.size()+"\n"
                                          +"num of non capital: "+(Main.nonCapital.size())+"\n"
                                         +"num of all city: "+(Main.nonCapital.size()+Main.Capital.size())+"\n"
-                                        +"max insance of city : "+maxCity.getDoc()+" "+maxCity.getName()+" "+maxCity.getDocplace().toString() +"\n"
+                                        //+"max insance of city : "+maxCity.getDoc()+" "+maxCity.getName()+" "+maxCity.getDocplace().toString() +"\n"
                                          + "runtime: " + timeSum);
                 alert.showAndWait();
                 alert.close();
@@ -329,27 +341,77 @@ public class Controller {
         }
     }
 
+    private void SetLang() {
+        Set <String> allLanguages = Main.lang.keySet();
+        Languages = FXCollections.observableArrayList(allLanguages);
+        Collections.sort(Languages,
+                new Comparator<String>()
+                {
+                    public int compare(String f1, String f2)
+                    {
+                        return f1.compareTo(f2);
+                    }
+                });
+        languageChooserComboBox.setItems(Languages);
+    }
+
+    private void fristRun(Queue<File> allFiles) throws Exception {
+        File file;
+        ReadFile readFile = new ReadFile();
+        while (!allFiles.isEmpty()){
+            file=allFiles.poll();
+            Queue<Doc> docs = new ArrayDeque<>();
+             readFile.setLangANDccITY(file);
+        }
+        Main.CityStorage=null;
+    }
+
     /**
      * sort the rows that was wrote to the disk
      * @throws IOException
      */
-    private void sortAllfiles() throws IOException {
-        File directory = new File(postingPathString);
+    private void sortAllfiles(String postingpath) throws IOException {
+        File directory = new File(postingpath);
         File[] fileList = directory.listFiles();
+        HashMap <String,StringBuilder> mergefile=new HashMap<>();
+        List<String>lwrite=new ArrayList<>();
         for (File file :fileList)
         {
             List<String> list = Files.readAllLines(Paths.get((file.getPath())));
-            Collections.sort(list);
             file.delete();
+            Collections.sort(list);
+            for (String s : list)
+            {
+                String [] strings=s.split("->");
+                if(!mergefile.containsKey(strings[0]))
+                    if(!mergefile.containsKey(strings[0].toLowerCase()))
+                        if(!mergefile.containsKey(strings[0].toUpperCase()))
+                            mergefile.put(strings[0], new StringBuilder(s.substring(strings[0].length())));
+                        else
+                            mergefile.get(strings[0].toUpperCase()).append(s.substring(strings[0].length()));
+                        else
+                            mergefile.get(strings[0].toLowerCase()).append(s.substring(strings[0].length()));
+                        else
+                            mergefile.get(strings[0]).append(s.substring(strings[0].length()));
+            }
             FileWriter fos = new FileWriter(file, true);
             PrintWriter out = new PrintWriter(fos, true);
-            for (String s : list)
-                out.println(s);
+            for (String s:mergefile.keySet())
+                lwrite.add(s +mergefile.get(s).toString());
+            Collections.sort(lwrite);
+
+            for(String n:lwrite)
+                out.println(n);
             out.close();
+
+            lwrite.clear();
+            list.clear();
+            mergefile.clear();
+
         }
         System.gc();
     }
-
+/*
     private City maxCityTerm() {
         City city = new City(" "," "," "," "," ");
         for (City x :Main.cityIndexer.values()){
@@ -358,7 +420,7 @@ public class Controller {
         }
             return city;
     }
-
+*/
     private void getAllFiles(String path, Queue<File> allFiles) {
         File directory = new File(path);
         File[] fileList = directory.listFiles();

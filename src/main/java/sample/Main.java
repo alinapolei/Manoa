@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 import org.apache.lucene.codecs.lucene50.Lucene50TermVectorsFormat;
 
 import java.io.File;
@@ -58,6 +59,8 @@ public class Main extends Application {
      */
     public static int numofAlldocs = 0;
 
+    public static HashMap<String ,City>citycorp=new HashMap<>();
+    public static HashMap <String,ArrayList<String>> lang=new HashMap<>();
 
     @Override
     public void start(Stage primaryStage) throws Exception {

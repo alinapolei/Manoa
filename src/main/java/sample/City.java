@@ -1,6 +1,7 @@
 package sample;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class City {
     /**
@@ -11,7 +12,15 @@ public class City {
     private String Currency;
     private String pop;
     private String Country;
-    private ArrayList<Integer> docplace;
+    //private ArrayList<Integer> docplace;
+
+    public HashMap<String, ArrayList<Integer>> getDocplacs() {
+        if (docplacs==null)
+            docplacs=new HashMap<>();
+        return docplacs;
+    }
+
+    private HashMap<String,ArrayList<Integer>> docplacs;
 
     public City(String name, String currency, String pop,String country,String doc) {
         this.doc=doc;
@@ -22,16 +31,18 @@ public class City {
         this.Country=country;
     }
 
+    /*
     public ArrayList<Integer> getDocplace() {
         if (docplace==null)
             docplace=new ArrayList<>();
         return docplace;
     }
 
+
     public void setDocplace(Integer index) {
         docplace.add(index);
     }
-
+*/
 
     public String getCountry() {
         return Country;
@@ -76,8 +87,8 @@ public class City {
 
     @Override
     public String toString() {
-        if (docplace==null)
+        if (docplacs==null)
             return name + " " +doc+" "+"[]";
-        return name + " " +doc+" "+docplace.toString();
+        return name + "  " +docplacs.toString();
     }
 }

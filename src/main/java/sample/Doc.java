@@ -46,12 +46,12 @@ public class Doc {
 
         }
         if (city!=("")&&city.compareTo("\n")!=0) {
-            if(!Main.CityStorage.containsKey(city)) {
+            if(Main.citycorp.get(city)==null) {
                 Main.cityIndexer.put(docNumber,new City(city,"","","",docNumber));
                 Main.nonCapital.add(city);
             }
             else {
-                Main.cityIndexer.put(docNumber,new City(city,Main.CityStorage.get(city).getCurrency(),Main.con.parseNumber(Main.CityStorage.get(city).getPop()),Main.CityStorage.get(city).getCountry(),docNumber));
+                Main.cityIndexer.put(docNumber,new City(city,Main.citycorp.get(city).getCurrency(),Main.con.parseNumber(Main.citycorp.get(city).getPop()),Main.citycorp.get(city).getCountry(),docNumber));
                 Main.Capital.add(city);
             }
 

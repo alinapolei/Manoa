@@ -277,9 +277,19 @@ public class Parse {
         tok.replace("\"", "");
         tok = cleanTok(tok);
 
+        /*
         if(doc.getCity()!="" && tok.toUpperCase().equals(doc.getCity())){
             Main.cityIndexer.get(doc.getDocNumber()).getDocplace().add(i);
+        }*/
+        if(doc.getCity()!="" && Main.citycorp.containsKey(tok.toUpperCase())){
+            if (Main.citycorp.get((tok.toUpperCase())).getDocplacs().containsKey((doc.getDocNumber())))
+                     Main.citycorp.get(tok.toUpperCase()).getDocplacs().get(doc.getDocNumber()).add(i);
+            else {
+                Main.citycorp.get(tok.toUpperCase()).getDocplacs().put(doc.getDocNumber(), new ArrayList<Integer>());
+                Main.citycorp.get(tok.toUpperCase()).getDocplacs().get(doc.getDocNumber()).add(i);
+            }
         }
+
         if(!tok.equals("")) {
             if (isStem)
                 tok = stemmer.stem(tok);
