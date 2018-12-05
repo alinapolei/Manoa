@@ -46,7 +46,7 @@ public class Doc {
 
         }
         if (city!=("")&&city.compareTo("\n")!=0) {
-            if(Main.citycorp.get(city)==null) {
+            if(Main.citycorp.get(city).getCountry()=="") {
                 Main.cityIndexer.put(docNumber,new City(city,"","","",docNumber));
                 Main.nonCapital.add(city);
             }
