@@ -19,15 +19,43 @@ import java.util.*;
 public class Main extends Application {
 
 
+    /**
+     * set of the stop words
+     */
     public static Set<String> stopWords = new HashSet<>();
+    /**
+     * instance of the indexer class
+     */
     public static Indexer indexer;
+    /**
+     * the cities
+     * key - the doc name
+     * value - a city object
+     */
     public static Map<String, City> cityIndexer = new HashMap<>();
+    /**
+     * hashmap that consists of all the docs in a specific chunk
+     */
     public static HashMap<String, Doc> allDocs;
+    /**
+     * all the cities that was read from the api
+     */
     public static HashMap<String, City> CityStorage = new HashMap<>();
-    //public static Set<String>Country =new HashSet<>();
+    /**
+     * a set of capital cities that was found in the corpus
+     */
     public static Set<String> Capital = new HashSet<>();
+    /**
+     * a ser of non capital cities that was found in the corpus
+     */
     public static Set<String> nonCapital = new HashSet<>();
+    /**
+     * instance of conditions class
+     */
     public static Conditions con = new Conditions();
+    /**
+     * a counter that represents that number of files that was read till now
+     */
     public static int numofAlldocs = 0;
 
 
@@ -40,50 +68,6 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) throws IOException {
-/*
-        File dic = new File("C:\\Users\\Dror\\Desktop\\Posting\\withStem\\Dictionary.txt");
-        List <String> list=Files.readAllLines(Paths.get(dic.getPath()));
-        HashMap <String,Integer> l=new HashMap<>();
-        List <Integer> in=new ArrayList<>();
-        for (String string:list ) {
-            in.add(Integer.parseInt(string.split("=")[string.split("=").length-1]));
-        }
-        FileWriter FOS=new FileWriter(new File("C:\\Users\\Dror\\Desktop\\Posting\\withStem\\val.txt"),true);
-        PrintWriter out=new PrintWriter(FOS,true);
-       Collections.sort(in, new Comparator<Integer>() {
-           @Override
-           public int compare(Integer o1, Integer o2) {
-               if(o1>o2)
-                   return -1;
-               if(o2>01)
-                   return 1;
-               return 0;
-           }
-       });
-        for (Integer i:in)
-            out.println(i);
-        out.close();
-        System.out.println("here");
-
-*/
         launch(args);
-
-
-        //Queue<File> allFiles = new ArrayDeque<>();
-       /* File directory = new File("C:\\Users\\Dror\\Desktop\\Posting\\withoutStem\\");
-        File[] fileList = directory.listFiles();
-        for (File file :fileList)
-        {
-            List<String> list = Files.readAllLines(Paths.get((file.getPath())));
-            Collections.sort(list);
-            file.delete();
-            FileWriter fos = new FileWriter(file, true);
-            PrintWriter out = new PrintWriter(fos, true);
-            for (String s : list)
-                out.println(s);
-            out.close();
-        }
-*/
-        //System.out.println("hewre");
     }
 }

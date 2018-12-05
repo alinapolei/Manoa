@@ -5,6 +5,11 @@ public class Conditions {
     public Conditions() {
     }
 
+    /**
+     *
+     * @param term
+     * @return true if the given term is a word(consists only from letters)
+     */
     public boolean isAlpha(String term) {
         char[] chars = term.toCharArray();
         for (char c : chars) {
@@ -15,6 +20,11 @@ public class Conditions {
         return true;
     }
 
+    /**
+     *
+     * @param name
+     * @return true if the given name is a number
+     */
     public boolean isNum(String name) {
 
         char[] chars = name.toCharArray();
@@ -26,6 +36,11 @@ public class Conditions {
         return true;
     }
 
+    /**
+     * unique parsing for population numbers
+     * @param number
+     * @return parsed number according to the rules of M, B, T as a string
+     */
     public String parseNumber(String number){
         boolean isPsik = number.contains(",");
 
@@ -77,17 +92,4 @@ public class Conditions {
         number = parts[0] + (!parts[1].equals("") ? "." + parts[1] : parts[1]) + "K";
         return number;
     }
-
-    /*static String getFixnum(String number, boolean isNumWithDot) {
-        if (isNumWithDot) {
-            String[] parts = number.split("\\.");
-            if (parts[0].length() > 3 && parts[0].length() <= 6) //1010.56 -> 1.01056K
-                number = parts[0].substring(0, parts[0].length() - 3) + "." + parts[0].substring(parts[0].length() - 3) + parts[1] + "K";
-            else if (parts[0].length() > 6 && parts[0].length() <= 9)
-                number = parts[0].substring(0, parts[0].length() - 6) + "." + parts[0].substring(parts[0].length() - 6) + parts[1] + "M";
-            else if (parts[0].length() > 9 && parts[0].length() <= 12)
-                number = parts[0].substring(0, parts[0].length() - 9) + "." + parts[0].substring(parts[0].length() - 9) + parts[1] + "B";
-        }
-        return number;
-    }*/
 }

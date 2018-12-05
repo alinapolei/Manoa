@@ -11,24 +11,54 @@ import java.util.*;
 
 public class Indexer {
 
+    /**
+     * the main dictionary
+     * the key is the term and the value is instance of DicEntery
+     * contains the data: term, df, tfCorpus
+     */
     private Map<String, DicEntry> dic;
+    /**
+     * the temp dictionary for words with lower letters
+     * the key is the term and the value is instance of DicEntery
+     * contains the data: term, df, tfCorpus
+     */
     private Map<String, DicEntry> lowTerms;
+    /**
+     * the temp dictionary for words with upper letters
+     * the key is the term and the value is instance of DicEntery
+     * contains the data: term, df, tfCorpus
+     */
     private Map<String, DicEntry> upTerms;
+    /**
+     * the temp dictionary for words that only starts with upper letter
+     * the key is the term and the value is instance of DicEntery
+     * contains the data: term, df, tfCorpus
+     */
     private Map<String, DicEntry> mixTerms;
+    /**
+     * the temp posting
+     * the key is the term and the value is instance of PostEntery
+     * contains the data: doc name, tf, is represents a term that has an instance in the document's title
+     */
     private Map<String, HashMap<String, PostEntry>> tmpPosting;
-   // Conditions con;
 
-
-
+    /**
+     * constructor for indexer
+     */
     public Indexer() {
         dic = Collections.synchronizedMap(new HashMap<>());
         lowTerms = Collections.synchronizedMap(new HashMap<>());
         upTerms = Collections.synchronizedMap(new HashMap<>());
         mixTerms = Collections.synchronizedMap(new HashMap<>());
         tmpPosting = Collections.synchronizedMap(new HashMap<>());
-       // con = new Conditions();
     }
 
+    /**
+     * adds the term to the dictionary
+     * @param term
+     * @param doc - doc name
+     * @param isTitle - if the term is in the title
+     */
     public void setDic(String term,Doc doc, boolean isTitle) {
         if (!this.dic.containsKey(term)) {
             newTerm(term, doc, this.dic, isTitle);
@@ -42,6 +72,12 @@ public class Indexer {
         }
     }
 
+    /**
+     * adds the term to the temp dictionary with lower words
+     * @param term
+     * @param doc - doc name
+     * @param isTitle - if the term is in the title
+     */
     public void setLowerTerms(String term,Doc doc, boolean isTitle) {
         if (!this.lowTerms.containsKey(term))
             newTerm(term, doc, this.lowTerms, isTitle);
@@ -52,6 +88,12 @@ public class Indexer {
         }
     }
 
+    /**
+     * adds the term to the temp dictionary with the upper words
+     * @param term
+     * @param doc - doc name
+     * @param isTitle - if the term is in the title
+     */
     public void setUpperTerms(String term,Doc doc, boolean isTitle) {
         if (!this.upTerms.containsKey(term))
             newTerm(term, doc, this.upTerms, isTitle);
@@ -61,6 +103,12 @@ public class Indexer {
         }
     }
 
+    /**
+     * adds the term to the temp dictionary with words that only the first letter is upper case
+     * @param term
+     * @param doc - doc name
+     * @param isTitle - if the term is in the title
+     */
     public void setMixedTerms(String term,Doc doc, boolean isTitle) {
         if (!this.mixTerms.containsKey(term))
             newTerm(term, doc, this.mixTerms, isTitle);
@@ -69,14 +117,31 @@ public class Indexer {
             editTerm(term, doc, this.mixTerms, isTitle);
         }
     }
+
+    /**
+     * treats the case when the term is new to each of the dictionaries
+     * builds a new object of DicEntery and appropriate object of PostEntery
+     * @param term
+     * @param doc
+     * @param terms - the specific dictionary that the term needs to be added
+     * @param isTitle
+     */
     private void newTerm(String term, Doc doc, Map<String, DicEntry> terms, boolean isTitle) {
         DicEntry dicEntry=new DicEntry(term);
-        //PostEntry post =new PostEntry(doc.getDocNumber(), isTitle);
         terms.put(term, dicEntry);
         HashMap<String, PostEntry> linkedList = new LinkedHashMap<>();
         linkedList.put(doc.getDocNumber(), new PostEntry(doc.getDocNumber(), isTitle));
         tmpPosting.put(term, linkedList);
     }
+
+    /**
+     * treats the case when the term is already in the dictionary
+     * no need to be added again, only need to build an appropriate object of PostEntery if necessary
+     * @param term
+     * @param doc
+     * @param terms - the specific dictionary that the term needs to be added
+     * @param isTitle
+     */
     private void editTerm(String term, Doc doc, Map<String, DicEntry> terms, boolean isTitle) {
         HashMap<String, PostEntry> postEntries = tmpPosting.get(term);
         if(postEntries==null) {
@@ -113,18 +178,24 @@ public class Indexer {
     public Map<String, DicEntry> getDic() {
         return dic;
     }
+
+    /**
+     * goes throw the tmp posting and removes the stop words
+     * @param stopWords - set of the stop words
+     */
     public void removeStopWordfromtmpPosting( Set<String> stopWords) {
         for (int i = 0; i < stopWords.size(); i++) {
-            // if (Main.indexer.getTmpPosting().containsKey(stopWords.toArray()[i].toString().toLowerCase()))
             Main.indexer.getTmpPosting().remove(stopWords.toArray()[i].toString().toLowerCase());
-            // if (Main.indexer.getTmpPosting().containsKey(stopWords.toArray()[i].toString().toUpperCase()))
             Main.indexer.getTmpPosting().remove(stopWords.toArray()[i].toString().toUpperCase());
             String tmp = Character.toUpperCase((stopWords.toArray()[i]).toString().toCharArray()[0]) + (stopWords.toArray()[i]).toString().substring(1).toLowerCase();
-            //if (Main.indexer.getTmpPosting().containsKey(tmp)) ;
             Main.indexer.getTmpPosting().remove(tmp);
-
         }
     }
+
+    /**
+     * goes throw the the dictionaries and removes the stop words
+     * @param stopWords - set of the stop words
+     */
     public void removeStopWords(Set<String> stopWords) {
         for (int i = 0; i < stopWords.size(); i++) {
             Main.indexer.getDic().remove(stopWords.toArray()[i]);
@@ -136,7 +207,13 @@ public class Indexer {
         }
     }
 
-
+    /**
+     * writes the data from tmp posting to the dick
+     * this function is called when the chunk is full
+     * at the end of this function the tmp posting is empty
+     * @param path - the destination path to write the data
+     * @throws IOException
+     */
     public void transferToDisk(String path) throws IOException {
         removeStopWordfromtmpPosting(Main.stopWords);
         removeStopWords(Main.stopWords);
@@ -149,50 +226,31 @@ public class Indexer {
         PrintWriter out=null;
         FileWriter fos=null;
         List<String> list1;
-       // ExecutorService executor = Executors.newFixedThreadPool(6);
-
         for(Character x : Finalsort.keySet()) {
-         //   executor.execute(new Thread() {
-              //  public  void run() {
-                    Character character = x;
-                  //  File file;
-                  //  ArrayList<String> sortList=a();
-                  //  HashMap<String, PostEntry> list;
-                  //  PrintWriter out=null;
-                  //  FileWriter fos=null;
+                Character character = x;
+                if (!Character.isDigit(x.charValue()) && !Character.isLetter(x.charValue()) && character != '$')
+                    file = new File(path + "\\" + "rest" + ".txt");
+                else
+                    file = new File(path + "\\" + x + ".txt");
 
-                    if (!Character.isDigit(x.charValue()) && !Character.isLetter(x.charValue()) && character != '$')
-                        file = new File(path + "\\" + "rest" + ".txt");
-                    else
-                        file = new File(path + "\\" + x + ".txt");
-
-                    if(file.exists()) {
-                        //list1.clear();
-                        list1 = Files.readAllLines(Paths.get((file.getPath())));
-                    }
-                    else
-                       list1 =new ArrayList<>();
-                    sortList.clear();
-                    sortList = Finalsort.get(x);
-                    for (String term : sortList) {
-                        list = tmpPosting.get(term);
-                       // try {
-                        // fos = new FileWriter(file, true);
-                       // } catch (IOException e) {
-                       //     e.printStackTrace();
-                      //  }
-                       // out = new PrintWriter(fos, true);
-                        StringBuilder t=new StringBuilder();
-                        for (PostEntry post : list.values())
-                            t.append(post.toString()+", ");
-                            //t = t + post.toString() + ", ";
-                        list1.add(term + " " + t);
-                        //out.println(term + " " + t);
-                    }
-                    System.gc();
-                    file.delete();
-                     fos = new FileWriter(file, true);
-                    out = new PrintWriter(fos, true);
+                if(file.exists()) {
+                    list1 = Files.readAllLines(Paths.get((file.getPath())));
+                }
+                else
+                   list1 =new ArrayList<>();
+                sortList.clear();
+                sortList = Finalsort.get(x);
+                for (String term : sortList) {
+                    list = tmpPosting.get(term);
+                    StringBuilder t=new StringBuilder();
+                    for (PostEntry post : list.values())
+                        t.append(post.toString()+", ");
+                    list1.add(term + " " + t);
+            }
+            System.gc();
+            file.delete();
+             fos = new FileWriter(file, true);
+            out = new PrintWriter(fos, true);
 
             for( String a :list1)
                      out.println(a);
@@ -208,19 +266,27 @@ public class Indexer {
                 fos=null;
                 */
                 }
-         //   });
-      //  }
-      //  executor.shutdown();
-     //   while (!executor.isTerminated()) {
-     //   }
         tmpPosting.clear();
     }
+
+    /**
+     * sorts the tmp posting by the term key according to alpha beth
+     * @return a sorted ArrayList<String>
+     */
     private ArrayList<String> sortTempPosting() {
         ArrayList<String> sortedKeys =
                 new ArrayList<String>(tmpPosting.keySet());
         Collections.sort(sortedKeys);
         return sortedKeys;
     }
+
+    /**
+     *
+     * @param sortList
+     * @return a map that consists of
+     * the key - first character of the letter
+     * and the value - all the terms that starts with this character
+     */
     private Map<Character, ArrayList<String>> finishSort(ArrayList<String>sortList){
         Map <Character,ArrayList<String>> MapAlpha=new HashMap<>();
         for(String x :sortList) {
@@ -250,9 +316,13 @@ public class Indexer {
     public Map<String, HashMap<String, PostEntry>> getTmpPosting() {
         return tmpPosting;
     }
+
+    /**
+     * merges all the dictionaries into the main dictionary
+     * appropriate merges is done in the posting if necessary
+     */
     public void setAllTerms(){
         for(String term : mixTerms.keySet()){
-            //String term = entery.getKey();
             DicEntry entery = mixTerms.get(term);
             DicEntry inUp = upTerms.get(term.toUpperCase());
             DicEntry inLow = lowTerms.get(term.toLowerCase());
@@ -298,6 +368,11 @@ public class Indexer {
         }
         lowTerms.clear();
     }
+
+    /**
+     * sets the maxtf and number of unique word in document according to the posting result
+     * @param postForEntery - a post of a single term
+     */
     private void updateDocDetails(HashMap<String, PostEntry> postForEntery) {
         for (PostEntry pdoc : postForEntery.values()) {
             Doc doc = Main.allDocs.get(pdoc.getDocNumber());
@@ -309,6 +384,14 @@ public class Indexer {
         }
     }
 
+    /**
+     *
+     * @param term
+     * @param entery - the firs dic entry
+     * @param inLow - the second dic entry
+     * @param inUp - the third dic entry
+     * @return a merged dic entry of the three given entries
+     */
     private DicEntry combineEnteries(String term, DicEntry entery, DicEntry inLow, DicEntry inUp) {
         DicEntry combinedEntery = new DicEntry(term);
         HashMap<String, PostEntry> combinedPost = new HashMap<>();
@@ -335,6 +418,11 @@ public class Indexer {
         return combinedEntery;
     }
 
+    /**
+     * combines the two given post entries to one post entry in the tmpposting
+     * @param combinedPost - the first post entry
+     * @param termToSearch - the second post entry
+     */
     private void combinePosts(HashMap<String, PostEntry> combinedPost, String termToSearch) {
         HashMap<String, PostEntry> post = tmpPosting.get(termToSearch);
         for(PostEntry postEntry : post.values()){
@@ -358,6 +446,12 @@ public class Indexer {
         }
         tmpPosting.remove(termToSearch);
     }
+
+    /**
+     * writes data about the docs like maxtf and num of unique words to a file in the dick
+     * @param allDocs
+     * @param path - the destination path to transfer to
+     */
     public void transferDocsData(HashSet<Doc> allDocs, String path) {
         try {
             PrintWriter out=null;
@@ -367,12 +461,6 @@ public class Indexer {
             out=new PrintWriter(fos,true);
             for (String post : Main.allDocs.keySet())
                 out.println(Main.allDocs.get(post).toString());
-            //BufferedWriter out = new BufferedWriter(new FileWriter(path + "\\Documents.txt"));
-            //Iterator it = allDocs.iterator();
-            //while(it.hasNext()) {
-              //  out.write(it.next().toString());
-               // out.newLine();
-            //}
             out.close();
         }
         catch(IOException e)

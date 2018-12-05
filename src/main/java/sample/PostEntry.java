@@ -1,6 +1,9 @@
 package sample;
 
 public class PostEntry {
+    /**
+     * class that represents specific post of a term in one document
+     */
     private String docNumber;
     private int tf=1;
     private boolean isTitle;

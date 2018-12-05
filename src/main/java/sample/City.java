@@ -3,15 +3,15 @@ package sample;
 import java.util.ArrayList;
 
 public class City {
-    private String doc;
-    private String name;
+    /**
+     * class that represents a city
+     */
+    private String doc;//doc name
+    private String name;//city name
     private String Currency;
     private String pop;
     private String Country;
     private ArrayList<Integer> docplace;
-
-
-
 
     public City(String name, String currency, String pop,String country,String doc) {
         this.doc=doc;

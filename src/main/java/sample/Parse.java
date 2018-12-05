@@ -12,16 +12,18 @@ public class Parse {
     List<String> months;
     List<String> shortMonths;
     Stemmer stemmer;
-    //Indexer index;
-    //Conditions con = new Conditions();
     String [] tokens;
-   // Queue<Doc> docs;
 
     public Parse() {
         //docs is the documents after readFile separate them all
         //index =new Indexer();
     }
 
+    /**
+     * parse all the tokens in the docs queue and enters the terms to appropriate dictionaries in the indexere
+     * @param dc - the document's to parse
+     * @param isStem - if the parser need to do stemming
+     */
     public void doParse(Queue<Doc> dc, boolean isStem) {
         //docs = dc;
         dateFormatSymbols = new DateFormatSymbols(new Locale("en", "US"));
@@ -248,6 +250,12 @@ public class Parse {
             }
         }
     }
+
+    /**
+     *
+     * @param tok
+     * @return a cleaned string from all characters that are not letter or number, from the begging and the end of the string
+     */
     private String cleanTok(String tok){
         while (tok.length() > 0 && ((!Character.isLetter(tok.charAt(0)) && !Character.isDigit(tok.charAt(0))) || tok.startsWith("\n")) && !tok.equals("") && !tok.startsWith("$") && !tok.startsWith("\""))
             tok = tok.substring(1);
@@ -256,6 +264,15 @@ public class Parse {
 
         return tok;
     }
+
+    /**
+     * decides which dictionary to put the word
+     * @param tok - the word
+     * @param isStem - if to do stem for the word
+     * @param doc - the document where this word was found
+     * @param isTitle - if the wordss was found in the title of the document
+     * @param i - the place of the word in the document
+     */
     private void word(String tok, boolean isStem, Doc doc, boolean isTitle, int i){
         tok.replace("\"", "");
         tok = cleanTok(tok);
@@ -279,6 +296,10 @@ public class Parse {
         }
     }
 
+    /**
+     * transfers the chunk to the disk
+     * @param path - destination path to write
+     */
     public void transferDisk(String path) {
         try {
             Main.indexer.transferToDisk(path);

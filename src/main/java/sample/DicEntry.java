@@ -1,7 +1,9 @@
 package sample;
 
 public class DicEntry {
-
+    /**
+     * class that represents the value of a row in the dictionary
+     */
    private String term;
    private int df;
    private int tfCourpus;

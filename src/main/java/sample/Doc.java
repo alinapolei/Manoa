@@ -10,8 +10,10 @@ import org.json.JSONObject;
 import java.util.Map;
 
 public class Doc {
-
-    private String docNumber;
+    /**
+     * class that represents a document
+     */
+    private String docNumber;//name of the document
     private String publishDate;
     private String header;
     private  String headLine;
@@ -19,12 +21,16 @@ public class Doc {
     private String city="";
     private int maxtf;
     private int numOfWords;
-    //private Conditions con;
 
     public String getCity() {
         return city;
     }
 
+    /**
+     * sets the value of the document's city according to the tag <f p=104></f>
+     * @param arry - an array of all the tags <F....></F> that exists in the document
+     * @throws Exception
+     */
     public void setCity(Object[] arry) throws Exception {
         Object[] array = arry;
         for (int i =array.length-1; i >-1 ; i--) {
@@ -45,13 +51,8 @@ public class Doc {
                 Main.nonCapital.add(city);
             }
             else {
-                //con=new Conditions();
-               // String cur = Main.CityStorage.get(city).getCurrency();
-               // String pop = Main.CityStorage.get(city).getPop();
-              //  String country=Main.CityStorage.get(city).getCountry();
                 Main.cityIndexer.put(docNumber,new City(city,Main.CityStorage.get(city).getCurrency(),Main.con.parseNumber(Main.CityStorage.get(city).getPop()),Main.CityStorage.get(city).getCountry(),docNumber));
                 Main.Capital.add(city);
-                //Main.Country.add(Main.CityStorage.get(city).getCountry());
             }
 
 

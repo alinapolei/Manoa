@@ -14,6 +14,12 @@ public class ReadFile {
     public ReadFile() {
     }
 
+    /**
+     * separate the geven file to documents into the given hashset, according to tag <DOC></DOC>
+     * @param file
+     * @param hashSet
+     * @throws Exception
+     */
     public void separateDocuments(File file, Queue<Doc> hashSet) throws Exception {
             try {
                 int i=0;
@@ -44,6 +50,13 @@ public class ReadFile {
             }
     }
 
+    /**
+     * set the value of the doc's parameters according to the appropriate tags
+     * @param temp
+     * @param x
+     * @param dateTag
+     * @param headTag
+     */
     public void setDocParrameters(Doc temp,Element x,String dateTag,String headTag)
     {
         temp.setPublishDate(x.getElementsByTag(dateTag).text());
@@ -57,7 +70,12 @@ public class ReadFile {
 
     }
 
-
+    /**
+     * reads the file of stop words and put the words into the given set
+     * @param stopWords
+     * @param path
+     * @throws IOException
+     */
     public void setStopWords(Set<String> stopWords, String path) throws IOException {
         File file=new File(path);
         String []stopWordsArray =(String.join("\n", Files.readAllLines(file.toPath()))).split("\n");

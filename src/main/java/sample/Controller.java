@@ -36,7 +36,9 @@ public class Controller {
 
     @FXML
     public void initialize(){
-        //SortedSet<String> allLanguages = new TreeSet<String>();
+        /**
+         * set the languages list
+         */
         List<String> allLanguages = new ArrayList<>();
         String[] languages = Locale.getISOLanguages();
         for (int i = 0; i < languages.length; i++){
@@ -87,7 +89,9 @@ public class Controller {
     }
 
     public void resetButton(ActionEvent actionEvent) {
-        //clear the dictionary and delete the posting files
+        /**
+         * clear the dictionary and delete the posting files
+         */
         if(!postingPathString.equals("")){
             try {
                 File directory = new File(postingPathString);
@@ -178,10 +182,6 @@ public class Controller {
                     alert.setHeaderText("The dictionary saved successfully");
                     alert.showAndWait();
                     alert.close();
-
-
-
-
                 }
             }
             catch (Exception e){
@@ -281,10 +281,8 @@ public class Controller {
                 readFile.setStopWords(Main.stopWords, corpusPathString + "\\stop_words.txt");
                 Main.indexer = new Indexer();
                 Parse parse = new Parse();
-                //HashSet<Doc> docs = new HashSet<>();
                 long start = System.nanoTime();
                 int counter = 0;
-                //for (File file : allFiles) {
                     while(!allFiles.isEmpty()){
                         File file=allFiles.poll();
                         counter++;
@@ -302,14 +300,7 @@ public class Controller {
                     Queue<Doc> docs = new ArrayDeque<>();
                     readFile.separateDocuments(file, docs);
                     parse.doParse(docs, isStemCheckbox.isSelected());
-                    //System.out.println("[+] doneParseDoc " + file.getName());
-                  //  for(Doc doc: docs)
-                     //   Main.allDocs.put(doc.getDocNumber(),doc);
-
                     docs.clear();
-                    //System.out.println("sum: " + (System.nanoTime() - start1) * Math.pow(10, -9));
-
-
                 }
                 writeToDisk(Main.cityIndexer, postingpath);
                 parse.transferDisk(postingpath);
@@ -319,6 +310,7 @@ public class Controller {
                 double timeSum = (System.nanoTime() - start) * Math.pow(10, -9);
                 //System.out.println("sum: " + (System.nanoTime() - start) * Math.pow(10, -9));
                 City maxCity=maxCityTerm();
+                sortAllfiles();
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setHeaderText("Finished successfully to retrieve files");
                 alert.setContentText("num of documents: " +Main.numofAlldocs+ "\n"
@@ -335,6 +327,27 @@ public class Controller {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * sort the rows that was wrote to the disk
+     * @throws IOException
+     */
+    private void sortAllfiles() throws IOException {
+        File directory = new File(postingPathString);
+        File[] fileList = directory.listFiles();
+        for (File file :fileList)
+        {
+            List<String> list = Files.readAllLines(Paths.get((file.getPath())));
+            Collections.sort(list);
+            file.delete();
+            FileWriter fos = new FileWriter(file, true);
+            PrintWriter out = new PrintWriter(fos, true);
+            for (String s : list)
+                out.println(s);
+            out.close();
+        }
+        System.gc();
     }
 
     private City maxCityTerm() {
@@ -359,6 +372,12 @@ public class Controller {
         }
     }
 
+    /**
+     * writes the city dictionary to the dick
+     * @param cityIndexer
+     * @param path
+     * @throws IOException
+     */
     private void writeToDisk(Map<String, City> cityIndexer, String path) throws IOException {
         File file = new File(path+"\\cities.txt");
         List<String> list;
@@ -369,17 +388,13 @@ public class Controller {
         for (String s:cityIndexer.keySet())
             list.add(cityIndexer.get(s).toString());
         PrintWriter out = null;
-        //for (String term : cityIndexer.keySet()) {
-          //  City city = cityIndexer.get(term);
-            file.delete();
-            FileWriter fos = new FileWriter(file, true);
-            out = new PrintWriter(fos, true);
-            for (String string:list)
-                out.println(string);
-            list.clear();
-            //out.println(city.toString());
-        //}
-        //if(out!=null)
-            out.close();
+
+        file.delete();
+        FileWriter fos = new FileWriter(file, true);
+        out = new PrintWriter(fos, true);
+        for (String string:list)
+            out.println(string);
+        list.clear();
+        out.close();
     }
 }
