@@ -113,7 +113,7 @@ public class ReadFile {
                 if ((arr[j].toString()).contains("<f p=\"105\">")) {
                     tmp = arr[j].toString().split("<f p=\"105\">")[1].split(" ");
                     for (int k = 0; k < tmp.length; k++)
-                        if (!tmp[k].equals("") && !tmp[k].equals("\n") && tmp[k].compareTo("</f>") != 0) {
+                        if (!tmp[k].equals("") && !tmp[k].equals("\n") && tmp[k].compareTo("</f>") != 0&&Main.con.isAlpha(tmp[k])) {
                             if(Main.lang.containsKey(tmp[k].toLowerCase()))
                                 Main.lang.get(tmp[k].toLowerCase()).add(x.get(i).getElementsByTag("DOCNO").text());
                             else {
