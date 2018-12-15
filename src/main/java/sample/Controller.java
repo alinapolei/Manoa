@@ -18,6 +18,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -27,6 +28,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import javax.management.Query;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -477,17 +479,29 @@ public class Controller {
 
 
 
-    public void runQuery(ActionEvent actionEvent) {
-        if (queryPathString == null || queryPathString.equals("") || query.getText().equals("")) {
+    public void runQuery(ActionEvent actionEvent) throws Exception {
+        if (queryPathString == null && query.getText().equals("")) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setHeaderText("You must enter a query");
             alert.showAndWait();
             alert.close();
         }
         else {
-            Searcher searcher = new Searcher();
-            Ranker ranker = new Ranker();
+            Queue<Queryy> queries = new ArrayDeque<>();
+            if(queryPathString != null) {
+                ReadFile readFile = new ReadFile();
+                File file = new File(queryPathString);
+                readFile.separateQueries(file, queries);
+            }
+            else if(!query.getText().equals("")) {
+                queries.add(new Queryy(query.getText()));
+            }
 
+            Searcher searcher = new Searcher();
+            while (!queries.isEmpty()){
+                Queryy queryy = queries.poll();
+                searcher.search(queryy);
+            }
 
             showResults();
         }
@@ -506,7 +520,11 @@ public class Controller {
     }
 
     public void queryPathChooser(ActionEvent actionEvent) {
-        File file = openFileLocation();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose file");
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        File file = fileChooser.showOpenDialog(new Stage());
+
         if(file != null) {
             queryPath.setText(file.getPath());
             queryPathString = file.getPath();

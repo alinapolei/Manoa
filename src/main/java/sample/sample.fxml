@@ -63,7 +63,7 @@
          <children>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <TextField fx:id="query" disable="true" prefHeight="31.0" prefWidth="240.0" promptText="enter a query" />
+                  <TextField fx:id="query" prefHeight="31.0" prefWidth="240.0" promptText="enter a query" />
                </children>
             </HBox>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.halignment="CENTER" GridPane.rowIndex="1">
