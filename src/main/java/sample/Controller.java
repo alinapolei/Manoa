@@ -298,7 +298,7 @@ public class Controller {
                     while(!allFiles.isEmpty()){
                         File file=allFiles.poll();
                         counter++;
-                        if(counter == 220) {
+                        if(counter == 150) {
                             System.out.println("[+]Transfer To Disk");
                             parse.transferDisk(postingpath);
                             Main.indexer.transferDocsData(new HashSet<Doc>(Main.allDocs.values()), postingpath);
