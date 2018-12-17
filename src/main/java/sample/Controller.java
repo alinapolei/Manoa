@@ -3,6 +3,10 @@ package sample;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -12,15 +16,19 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import javax.management.Query;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -36,6 +44,13 @@ public class Controller {
     public CheckBox isStemCheckbox;
     public ComboBox languageChooserComboBox;
     public ObservableList<String> Languages;
+
+    public TextField query;
+    public TextField queryPath;
+    public String queryPathString;
+    public CheckBox isShowDominantCheckbox;
+    public CheckBox isSemanticCheckbox;
+    public List<String> selectedLanguages;
 
     @FXML
     public void initialize(){
@@ -458,5 +473,150 @@ public class Controller {
             out.println(string);
         list.clear();
         out.close();
+    }
+
+
+
+
+
+    public void runQuery(ActionEvent actionEvent) throws Exception {
+        if (queryPathString == null && query.getText().equals("")) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText("You must enter a query");
+            alert.showAndWait();
+            alert.close();
+        }
+        else {
+            Queue<Queryy> queries = new ArrayDeque<>();
+            if(queryPathString != null) {
+                ReadFile readFile = new ReadFile();
+                File file = new File(queryPathString);
+                readFile.separateQueries(file, queries);
+            }
+            else if(!query.getText().equals("")) {
+                queries.add(new Queryy(query.getText()));
+            }
+
+            Searcher searcher = new Searcher();
+            while (!queries.isEmpty()){
+                Queryy queryy = queries.poll();
+                searcher.search(queryy);
+            }
+
+            showResults();
+        }
+    }
+
+    private void showResults() {
+        VBox root = new VBox();//?
+
+        Stage stage = new Stage();
+        stage.setTitle("Results");
+        Scene scene = new Scene(root, 300, 400);
+        stage.setScene(scene);
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner(corpusPath.getScene().getWindow());
+        stage.show();
+    }
+
+    public void queryPathChooser(ActionEvent actionEvent) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose file");
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        File file = fileChooser.showOpenDialog(new Stage());
+
+        if(file != null) {
+            queryPath.setText(file.getPath());
+            queryPathString = file.getPath();
+        }
+    }
+
+    public void chooseLanguage(ActionEvent actionEvent) {
+        if(Main.lang != null && Main.lang.keySet() != null){
+            if(selectedLanguages != null)
+                selectedLanguages.clear();
+            TableView<String> table = new TableView<>();
+            TableColumn<String, Boolean> chooserCol = new TableColumn<>("chooser");
+            TableColumn<String, String> languageCol = new TableColumn<>("language");
+            // Defines how to fill data for each cell.
+            chooserCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
+            Callback<TableColumn<String, Boolean>, TableCell<String, Boolean>> cellFactory
+                    = new Callback<TableColumn<String, Boolean>, TableCell<String, Boolean>>() {
+                @Override
+                public TableCell call(final TableColumn<String, Boolean> param) {
+                    final TableCell<String, Boolean> cell = new TableCell<String, Boolean>() {
+                        CheckBox checkBox = new CheckBox();
+
+                        @Override
+                        public void updateItem(Boolean item, boolean empty) {
+                            super.updateItem(item, empty);
+                            if (empty) {
+                                setGraphic(null);
+                                setText(null);
+                            } else {
+                                checkBox.setOnAction(event -> {
+                                    if(checkBox.isSelected()) {
+                                        if (selectedLanguages == null) selectedLanguages = new ArrayList<>();
+                                        selectedLanguages.add(getTableView().getItems().get(getIndex()));
+                                    }
+                                    else{
+                                        selectedLanguages.remove(getTableView().getItems().get(getIndex()));
+                                    }
+                                });
+                                setGraphic(checkBox);
+                                setText(null);
+                            }
+                        }
+                    };
+                    return cell;
+                }
+            };
+            chooserCol.setCellFactory(cellFactory);
+            languageCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()));
+
+            // Set Sort type for userName column
+            languageCol.setSortType(TableColumn.SortType.ASCENDING);
+
+            // Display row data
+            List list = new ArrayList(Main.lang.keySet());
+            Collections.sort(list, new Comparator<DicEntry>() {
+                @Override
+                public int compare(DicEntry o1, DicEntry o2) {
+                    return o1.getTerm().compareTo(o2.getTerm());
+                }
+            });
+            table.setItems(FXCollections.observableList(list));
+            table.getColumns().addAll(chooserCol, languageCol);
+
+            Button close = new Button();
+            close.setText("ready");
+
+            VBox root = new VBox();
+            root.setPadding(new Insets(5));
+            root.getChildren().add(table);
+            root.getChildren().add(close);
+            Stage stage = new Stage();
+
+            close.setOnAction(event -> {
+                stage.close();
+            });
+
+            stage.setTitle("Languages");
+            Scene scene = new Scene(root, 300, 400);
+            stage.setScene(scene);
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(corpusPath.getScene().getWindow());
+            stage.show();
+        }
+        else{
+            Alert alert=new Alert(Alert.AlertType.INFORMATION);
+            alert.setContentText("You must hit before the start button");
+            alert.showAndWait();
+        }
+    }
+
+    public void saveQueryResults(ActionEvent actionEvent) {
+        File file = openFileLocation();
+        //save the results
     }
 }

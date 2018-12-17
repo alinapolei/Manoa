@@ -6,6 +6,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import javax.management.Query;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
@@ -44,6 +45,35 @@ public class ReadFile {
                 hashSet.add(temp);
                 temp = new Doc();
                 //System.out.println(hashSet.size());
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * separate the given file to queries into the given hashset, according to tag <top></top>
+     *
+     * @param file
+     * @param hashSet
+     * @throws Exception
+     */
+    public void separateQueries(File file, Queue<Queryy> hashSet) throws Exception {
+        try {
+            int i = 0;
+            Document doc = Jsoup.parse(file, "utf-8");
+            Elements x = doc.getElementsByTag("top");
+            Queryy query = new Queryy();
+            for (i = 0; i < x.size(); i++) {
+                query.setNumber(x.get(i).getElementsByTag("num").text().split(" ")[1]);
+                query.setTitle(x.get(i).getElementsByTag("title").text());
+                query.setDesc(x.get(i).getElementsByTag("desc").text().split("Narrative:")[0].split(" ")[1]);
+                query.setNarr(x.get(i).getElementsByTag("narr").text().split(" ")[1]);
+
+                hashSet.add(query);
+                query = new Queryy();
+
             }
 
         } catch (IOException e) {
