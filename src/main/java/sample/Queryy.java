@@ -17,7 +17,7 @@ public class Queryy {
     public Queryy(String title) {
         this.title = title;
         Random rand = new Random();
-        this.number = rand.nextInt(500) + 1 + "";
+                this.number = rand.nextInt(500) + 1 + "";
     }
 
     public String getNumber() {

@@ -495,17 +495,17 @@ public class Controller {
             }
             else if(!query.getText().equals("")) {
                 queries.add(new Queryy(query.getText()));
+                //here
+
             }
 
             Searcher searcher = new Searcher();
-            while (!queries.isEmpty()){
-                Queryy queryy = queries.poll();
-                searcher.search(queryy);
+            searcher.search(queries,isStemCheckbox.isSelected());
             }
 
             showResults();
         }
-    }
+
 
     private void showResults() {
         VBox root = new VBox();//?
