@@ -7,11 +7,11 @@ public class Searcher {
     HashSet<String> finalTokens = new HashSet<>();
     Parse parse;
 
-    public void search(Queue<Queryy> query,boolean isStem) {
+    public HashSet<String> search(Queue<Queryy> query,boolean isStem) {
         parse=new Parse();
         parse.doQuereyparse(query,isStem,finalTokens);
         removeStopwords();
-        System.out.println("heere");
+        return finalTokens;
     }
 
     private void removeStopwords() {

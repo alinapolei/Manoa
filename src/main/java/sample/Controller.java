@@ -12,6 +12,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -488,28 +490,46 @@ public class Controller {
         }
         else {
             Queue<Queryy> queries = new ArrayDeque<>();
-            if(queryPathString != null) {
+            if (queryPathString != null) {
                 ReadFile readFile = new ReadFile();
                 File file = new File(queryPathString);
                 readFile.separateQueries(file, queries);
-            }
-            else if(!query.getText().equals("")) {
+            } else if (!query.getText().equals("")) {
                 queries.add(new Queryy(query.getText()));
                 //here
 
             }
 
             Searcher searcher = new Searcher();
-            searcher.search(queries,isStemCheckbox.isSelected());
-            }
+            HashSet<String> finalTokens = searcher.search(queries, isStemCheckbox.isSelected());
 
-            showResults();
+            String postingpath;
+            if(isStemCheckbox.isSelected())
+                postingpath = postingPathString + "\\withStem";
+            else
+                postingpath = postingPathString + "\\withoutStem";
+            Ranker ranker = new Ranker(postingpath);
+            HashMap<String, Double> rankedDocs = ranker.rank(finalTokens);
+
+            showResults(rankedDocs);
         }
+    }
 
 
-    private void showResults() {
-        VBox root = new VBox();//?
+    private void showResults(HashMap<String, Double> rankedDocs) {
+        TableView<String> table = new TableView<>();
+        TableColumn<String, String> docCol = new TableColumn<>("מסמך");
+        docCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()));
+        docCol.setSortType(TableColumn.SortType.ASCENDING);
+        // Display row data
+        List list = new ArrayList(rankedDocs.keySet());
+        table.setItems(FXCollections.observableList(list));
+        table.getColumns().addAll(docCol);
 
+
+        StackPane root = new StackPane();
+        root.setPadding(new Insets(5));
+        root.getChildren().add(table);
         Stage stage = new Stage();
         stage.setTitle("Results");
         Scene scene = new Scene(root, 300, 400);

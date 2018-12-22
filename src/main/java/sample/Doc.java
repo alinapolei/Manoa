@@ -8,6 +8,7 @@ import com.mashape.unirest.request.GetRequest;
 import org.json.JSONObject;
 
 import java.util.Map;
+import java.util.StringTokenizer;
 
 public class Doc {
     /**
@@ -21,6 +22,7 @@ public class Doc {
     private String city="";
     private int maxtf;
     private int numOfWords;
+    private int length;
 
     public String getCity() {
         return city;
@@ -58,6 +60,11 @@ public class Doc {
 
         }
     }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
     public Doc() {}
 
     public String getDocNumber() {
@@ -110,15 +117,33 @@ public class Doc {
     public void setMaxtf(int maxtf) {
         this.maxtf = maxtf;
     }
+
+    public void setNumOfWords(int numOfWords) {
+        this.numOfWords = numOfWords;
+    }
+
     public void increaseNumOfWords() {
         this.numOfWords++;
     }
     public int getNumOfWords() {
         return numOfWords;
     }
+
+    public int getLength() {
+        if(length == 0) {
+            StringTokenizer tokens = new StringTokenizer(bodyText);
+            length = tokens.countTokens();
+        }
+        return length;
+    }
+
+    public void setLength(int length) {
+        this.length = length;
+    }
+
     @Override
     public String toString() {
-        return docNumber + " " + "maxtf=" + maxtf + " " + "length=" + numOfWords + " " +
+        return docNumber + " " + "maxtf=" + maxtf + " " + "uniqueWords=" + numOfWords + " " + "length=" + getLength() + " " +
                 (!city.equals("") ? ("city=" + city) : "");
     }
 }
