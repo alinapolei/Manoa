@@ -22,34 +22,38 @@ public class Ranker {
         this.postingPath = postingPath;
     }
 
-    public HashMap<String, Double> rank(HashSet<String> finalTokens) {
-        HashMap<String, Integer> finalUniqueTokens = getUniqueTokens(finalTokens);
-        HashMap<String, Double> rankedDocs = new HashMap<>();
-        HashMap<String, HashMap<String, PostEntry>> posts = getPostEntery(finalUniqueTokens);
-        HashMap<String, Doc> docs = readDocsFromDisc();
+    public HashMap<Queryy, HashMap<String, Double>> rank(HashMap<Queryy, HashSet<String>> queries) {
+        HashMap<Queryy, HashMap<String, Double>> finalresults = new HashMap<>();
+        for(Queryy query : queries.keySet()) {
+            HashSet<String> finalTokens = queries.get(query);
+            HashMap<String, Integer> finalUniqueTokens = getUniqueTokens(finalTokens);
+            HashMap<String, Double> rankedDocs = new HashMap<>();
+            HashMap<String, HashMap<String, PostEntry>> posts = getPostEntery(finalUniqueTokens);
+            HashMap<String, Doc> docs = readDocsFromDisc();
 
-        avdl = docs.values().stream().mapToInt((x)-> x.getLength()).average().orElse(-1);
-        numDocs = docs.size();
-        for(Doc doc : docs.values()) {
-            sum = 0;
-            for (String term : posts.keySet()) {
-                PostEntry postEntry = posts.get(term).get(doc.getDocNumber());
-                if(postEntry != null)
-                {
-                    dLength = doc.getLength();
-                    c_w_d = postEntry.getTf();
-                    c_w_q = finalUniqueTokens.get(term);
-                    df_w = Main.indexer.getDic().get(term).getDf();
+            avdl = docs.values().stream().mapToInt((x) -> x.getLength()).average().orElse(-1);
+            numDocs = docs.size();
+            for (Doc doc : docs.values()) {
+                sum = 0;
+                for (String term : posts.keySet()) {
+                    PostEntry postEntry = posts.get(term).get(doc.getDocNumber());
+                    if (postEntry != null) {
+                        dLength = doc.getLength();
+                        c_w_d = postEntry.getTf();
+                        c_w_q = finalUniqueTokens.get(term);
+                        df_w = Main.indexer.getDic().get(term).getDf();
 
-                    //the formula BM25
-                    double tmp = ((k + 1) * c_w_d) / (c_w_d + k * (1 - b + b * dLength / avdl));
-                    double tmp1 = Math.log((numDocs+1) / df_w);
-                    sum += (c_w_q * tmp * tmp1);
+                        //the formula BM25
+                        double tmp = ((k + 1) * c_w_d) / (c_w_d + k * (1 - b + b * dLength / avdl));
+                        double tmp1 = Math.log((numDocs + 1) / df_w);
+                        sum += (c_w_q * tmp * tmp1);
+                    }
                 }
+                rankedDocs.put(doc.getDocNumber(), sum);
             }
-            rankedDocs.put(doc.getDocNumber(), sum);
+            finalresults.put(query, sortRankedDocs(rankedDocs));
         }
-        return sortRankedDocs(rankedDocs);
+        return finalresults;
     }
 
     private HashMap<String, Double> sortRankedDocs(HashMap<String, Double> unsortMap) {

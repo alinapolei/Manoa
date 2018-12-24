@@ -509,27 +509,32 @@ public class Controller {
             else
                 postingpath = postingPathString + "\\withoutStem";
             Ranker ranker = new Ranker(postingpath);
-            //HashMap<String, Double> rankedDocs = ranker.rank(finalTokens);
+            HashMap<Queryy, HashMap<String, Double>> rankedDocs = ranker.rank(finalTokens);
 
-            //showResults(rankedDocs);
+            showResults(rankedDocs);
         }
     }
 
 
-    private void showResults(HashMap<String, Double> rankedDocs) {
-        TableView<String> table = new TableView<>();
-        TableColumn<String, String> docCol = new TableColumn<>("מסמך");
-        docCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()));
-        docCol.setSortType(TableColumn.SortType.ASCENDING);
-        // Display row data
-        List list = new ArrayList(rankedDocs.keySet());
-        table.setItems(FXCollections.observableList(list));
-        table.getColumns().addAll(docCol);
-
-
+    private void showResults(HashMap<Queryy, HashMap<String, Double>> rankedDocs) {
         StackPane root = new StackPane();
         root.setPadding(new Insets(5));
-        root.getChildren().add(table);
+
+        for(Queryy query : rankedDocs.keySet()) {
+            Label label = new Label(query.getTitle());
+            TableView<String> table = new TableView<>();
+            TableColumn<String, String> docCol = new TableColumn<>("מסמך");
+            docCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()));
+            docCol.setSortType(TableColumn.SortType.ASCENDING);
+            // Display row data
+            List list = new ArrayList(rankedDocs.get(query).keySet());
+            table.setItems(FXCollections.observableList(list));
+            table.getColumns().addAll(docCol);
+
+            root.getChildren().add(label);
+            root.getChildren().add(table);
+        }
+
         Stage stage = new Stage();
         stage.setTitle("Results");
         Scene scene = new Scene(root, 300, 400);
