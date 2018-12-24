@@ -517,11 +517,12 @@ public class Controller {
 
 
     private void showResults(HashMap<Queryy, HashMap<String, Double>> rankedDocs) {
-        StackPane root = new StackPane();
+        ScrollPane root = new ScrollPane();
         root.setPadding(new Insets(5));
+        VBox vBox = new VBox();
 
         for(Queryy query : rankedDocs.keySet()) {
-            Label label = new Label(query.getTitle());
+            Label label = new Label("->" + query.getTitle());
             TableView<String> table = new TableView<>();
             TableColumn<String, String> docCol = new TableColumn<>("מסמך");
             docCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()));
@@ -531,13 +532,14 @@ public class Controller {
             table.setItems(FXCollections.observableList(list));
             table.getColumns().addAll(docCol);
 
-            root.getChildren().add(label);
-            root.getChildren().add(table);
+            vBox.getChildren().add(label);
+            vBox.getChildren().add(table);
         }
+        root.setContent(vBox);
 
         Stage stage = new Stage();
         stage.setTitle("Results");
-        Scene scene = new Scene(root, 300, 400);
+        Scene scene = new Scene(root, 300, 1500);
         stage.setScene(scene);
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(corpusPath.getScene().getWindow());
