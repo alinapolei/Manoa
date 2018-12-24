@@ -154,54 +154,53 @@ public class Parse {
         }
     }
 
-    public void doQuereyparse(Queue<Queryy> queryys, boolean isStem,HashSet<String>finalTokens) {
+    public void doQuereyparse(Queryy query, boolean isStem,HashMap<Queryy, HashSet<String>> finalTokens) {
         initParameters();
-        while(!queryys.isEmpty()){
-            Queryy queryy=queryys.poll();
-                tokens = queryy.getTitle().split(" ");
-                for (int i = 0; i < tokens.length; i++) {
-                    StringBuilder tok = new StringBuilder(tokens[i]);
-                    boolean isDollar = false;
-                    tok = new StringBuilder(cleanTok(tok.toString()));
-                    if (tok.toString().equals("") || tok.toString().equals(" ")) continue;
-                    if (tok.toString().startsWith("\"")) {
-                        tok=new StringBuilder( tok.toString().replaceFirst("\"", ""));
-                        int c = i;
-                        StringBuilder cc = new StringBuilder(tok);
-                        if (!tok.toString().endsWith("\"")) {
-                            tok = getStringBuilder(i, tok);
-                            finalTokens.add(tok.toString());
-                            i=c;
-                            tok = cc;
-                        }
-                        tok=new StringBuilder(tok.toString().replace("\"", ""));
-                        if (tok.toString().equals("") || tok.toString().equals(" ")) continue;
-                        quereyWordThreat(tok.toString(),isStem,finalTokens);
-                        continue;
-                    } else if (tok.toString().contains("-")) {
-                        finalTokens.add(tok.toString());
-                        continue;
+        HashSet<String> toks = new HashSet<>();
+        tokens = query.getTitle().split(" ");
+        for (int i = 0; i < tokens.length; i++) {
+            StringBuilder tok = new StringBuilder(tokens[i]);
+            boolean isDollar = false;
+            tok = new StringBuilder(cleanTok(tok.toString()));
+            if (tok.toString().equals("") || tok.toString().equals(" ")) continue;
+            if (tok.toString().startsWith("\"")) {
+                tok=new StringBuilder( tok.toString().replaceFirst("\"", ""));
+                int c = i;
+                StringBuilder cc = new StringBuilder(tok);
+                if (!tok.toString().endsWith("\"")) {
+                    tok = getStringBuilder(i, tok);
+                    toks.add(tok.toString());
+                    i=c;
+                    tok = cc;
+                }
+                tok=new StringBuilder(tok.toString().replace("\"", ""));
+                if (tok.toString().equals("") || tok.toString().equals(" ")) continue;
+                quereyWordThreat(tok.toString(),isStem,toks);
+                continue;
+            } else if (tok.toString().contains("-")) {
+                toks.add(tok.toString());
+                continue;
+            } else {
+                if (Main.con.isAlpha(tok.toString())) {
+                    //------put here stop words and parse for words
+                    if (tok.toString().equals("between") && i + 3 < tokens.length && tokens[i + 2].equals("and")) {
+                        B(i, tok);
+                    } else if (!tok.toString().equals("") && i + 1 < tokens.length && !tokens[i + 1].equals("") && StringUtil.isNumeric(tokens[i + 1])
+                            && (months.contains(tok.toString().toLowerCase()) || shortMonths.contains(tok.toString().toLowerCase()))) {
+                        tok = A(i, tok);
                     } else {
-                        if (Main.con.isAlpha(tok.toString())) {
-                            //------put here stop words and parse for words
-                            if (tok.toString().equals("between") && i + 3 < tokens.length && tokens[i + 2].equals("and")) {
-                                B(i, tok);
-                            } else if (!tok.toString().equals("") && i + 1 < tokens.length && !tokens[i + 1].equals("") && StringUtil.isNumeric(tokens[i + 1])
-                                    && (months.contains(tok.toString().toLowerCase()) || shortMonths.contains(tok.toString().toLowerCase()))) {
-                                tok = A(i, tok);
-                            } else {
-                                quereyWordThreat(tok.toString(),isStem,finalTokens);
-                                continue;
-                            }
-                        } else {
-                            tok = C(i, tok, isDollar);
-
-                        }
+                        quereyWordThreat(tok.toString(),isStem,toks);
+                        continue;
                     }
-                    finalTokens.add(tok.toString());
+                } else {
+                    tok = C(i, tok, isDollar);
+
                 }
             }
+            toks.add(tok.toString());
         }
+        finalTokens.put(query, toks);
+    }
 
     private StringBuilder C(int i, StringBuilder tok, boolean isDollar) {
         if (tok.toString().endsWith("$") || tok.toString().startsWith("$")) {

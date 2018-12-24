@@ -501,7 +501,7 @@ public class Controller {
             }
 
             Searcher searcher = new Searcher();
-            HashSet<String> finalTokens = searcher.search(queries, isStemCheckbox.isSelected());
+            HashMap<Queryy, HashSet<String>> finalTokens = searcher.search(queries, isStemCheckbox.isSelected());
 
             String postingpath;
             if(isStemCheckbox.isSelected())
@@ -509,9 +509,9 @@ public class Controller {
             else
                 postingpath = postingPathString + "\\withoutStem";
             Ranker ranker = new Ranker(postingpath);
-            HashMap<String, Double> rankedDocs = ranker.rank(finalTokens);
+            //HashMap<String, Double> rankedDocs = ranker.rank(finalTokens);
 
-            showResults(rankedDocs);
+            //showResults(rankedDocs);
         }
     }
 
