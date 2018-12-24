@@ -4,12 +4,15 @@ package sample;
 import java.util.*;
 
 public class Searcher {
-    HashSet<String> finalTokens = new HashSet<>();
+    HashMap<Queryy, HashSet<String>> finalTokens = new HashMap<>();
     Parse parse;
 
-    public HashSet<String> search(Queue<Queryy> query,boolean isStem) {
+    public HashMap<Queryy, HashSet<String>> search(Queue<Queryy> queryys,boolean isStem) {
         parse=new Parse();
-        parse.doQuereyparse(query,isStem,finalTokens);
+        while(!queryys.isEmpty()) {
+            Queryy query=queryys.poll();
+            parse.doQuereyparse(query, isStem, finalTokens);
+        }
         removeStopwords();
         return finalTokens;
     }
