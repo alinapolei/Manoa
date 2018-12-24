@@ -22,7 +22,7 @@ public class Ranker {
         this.postingPath = postingPath;
     }
 
-    public HashMap<Queryy, HashMap<String, Double>> rank(HashMap<Queryy, HashSet<String>> queries) {
+    public HashMap<Queryy, HashMap<String, Double>> rank(HashMap<Queryy, HashSet<String>> queries,List<String>cities) {
         HashMap<Queryy, HashMap<String, Double>> finalresults = new HashMap<>();
         for(Queryy query : queries.keySet()) {
             HashSet<String> finalTokens = queries.get(query);
@@ -34,6 +34,10 @@ public class Ranker {
             avdl = docs.values().stream().mapToInt((x) -> x.getLength()).average().orElse(-1);
             numDocs = docs.size();
             for (Doc doc : docs.values()) {
+                if(cities!=null &&!cities.isEmpty())
+                    if(!cities.contains(doc.getCity()))
+                        continue;
+
                 sum = 0;
                 for (String term : posts.keySet()) {
                     PostEntry postEntry = posts.get(term).get(doc.getDocNumber());
@@ -51,7 +55,11 @@ public class Ranker {
                 }
                 rankedDocs.put(doc.getDocNumber(), sum);
             }
-            finalresults.put(query, sortRankedDocs(rankedDocs));
+            HashMap<String, Double> top50=new HashMap<>() ;
+            sortRankedDocs(rankedDocs);
+            for (int i=0;i<50;i++)
+                top50.put(rankedDocs.keySet().toArray()[i].toString(),rankedDocs.get(i));
+            finalresults.put(query,top50);
         }
         return finalresults;
     }

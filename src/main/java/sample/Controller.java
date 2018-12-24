@@ -52,7 +52,7 @@ public class Controller {
     public String queryPathString;
     public CheckBox isShowDominantCheckbox;
     public CheckBox isSemanticCheckbox;
-    public List<String> selectedLanguages;
+    public List<String> selectedCities;
 
     @FXML
     public void initialize(){
@@ -501,7 +501,7 @@ public class Controller {
             }
 
             Searcher searcher = new Searcher();
-            HashMap<Queryy, HashSet<String>> finalTokens = searcher.search(queries, isStemCheckbox.isSelected());
+            HashMap<Queryy, HashSet<String>> finalTokens = searcher.search(queries, isStemCheckbox.isSelected(),isSemanticCheckbox.isSelected());
 
             String postingpath;
             if(isStemCheckbox.isSelected())
@@ -509,7 +509,7 @@ public class Controller {
             else
                 postingpath = postingPathString + "\\withoutStem";
             Ranker ranker = new Ranker(postingpath);
-            HashMap<Queryy, HashMap<String, Double>> rankedDocs = ranker.rank(finalTokens);
+            HashMap<Queryy, HashMap<String, Double>> rankedDocs = ranker.rank(finalTokens,selectedCities);
 
             showResults(rankedDocs);
         }
@@ -556,13 +556,14 @@ public class Controller {
         }
     }
 
-    public void chooseLanguage(ActionEvent actionEvent) {
-        if(Main.lang != null && Main.lang.keySet() != null){
-            if(selectedLanguages != null)
-                selectedLanguages.clear();
+    public void chooseCity(ActionEvent actionEvent) {
+        if(Main.citycorp != null){
+            if(selectedCities != null)
+                selectedCities.clear();
+
             TableView<String> table = new TableView<>();
             TableColumn<String, Boolean> chooserCol = new TableColumn<>("chooser");
-            TableColumn<String, String> languageCol = new TableColumn<>("language");
+            TableColumn<String, String> cityCol = new TableColumn<>("city");
             // Defines how to fill data for each cell.
             chooserCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
             Callback<TableColumn<String, Boolean>, TableCell<String, Boolean>> cellFactory
@@ -581,11 +582,11 @@ public class Controller {
                             } else {
                                 checkBox.setOnAction(event -> {
                                     if(checkBox.isSelected()) {
-                                        if (selectedLanguages == null) selectedLanguages = new ArrayList<>();
-                                        selectedLanguages.add(getTableView().getItems().get(getIndex()));
+                                        if (selectedCities == null) selectedCities = new ArrayList<>();
+                                        selectedCities.add(getTableView().getItems().get(getIndex()));
                                     }
                                     else{
-                                        selectedLanguages.remove(getTableView().getItems().get(getIndex()));
+                                        selectedCities.remove(getTableView().getItems().get(getIndex()));
                                     }
                                 });
                                 setGraphic(checkBox);
@@ -597,21 +598,21 @@ public class Controller {
                 }
             };
             chooserCol.setCellFactory(cellFactory);
-            languageCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()));
+            cityCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()));
 
             // Set Sort type for userName column
-            languageCol.setSortType(TableColumn.SortType.ASCENDING);
+            cityCol.setSortType(TableColumn.SortType.ASCENDING);
 
             // Display row data
-            List list = new ArrayList(Main.lang.keySet());
-            Collections.sort(list, new Comparator<DicEntry>() {
+            List list = new ArrayList(Main.citycorp.keySet());
+            Collections.sort(list, new Comparator<String>() {
                 @Override
-                public int compare(DicEntry o1, DicEntry o2) {
-                    return o1.getTerm().compareTo(o2.getTerm());
+                public int compare(String o1, String o2) {
+                    return o1.compareTo(o2);
                 }
             });
             table.setItems(FXCollections.observableList(list));
-            table.getColumns().addAll(chooserCol, languageCol);
+            table.getColumns().addAll(chooserCol, cityCol);
 
             Button close = new Button();
             close.setText("ready");
@@ -626,7 +627,7 @@ public class Controller {
                 stage.close();
             });
 
-            stage.setTitle("Languages");
+            stage.setTitle("Cities");
             Scene scene = new Scene(root, 300, 400);
             stage.setScene(scene);
             stage.initModality(Modality.WINDOW_MODAL);

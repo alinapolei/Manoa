@@ -13,14 +13,15 @@ public class Searcher {
     HashMap<Queryy, HashSet<String>> finalTokens = new HashMap<>();
     Parse parse;
 
-    public HashMap<Queryy, HashSet<String>> search(Queue<Queryy> queryys,boolean isStem) throws UnirestException {
+    public HashMap<Queryy, HashSet<String>> search(Queue<Queryy> queryys,boolean isStem,boolean isSemantic) throws UnirestException {
         parse=new Parse();
         while(!queryys.isEmpty()) {
             Queryy query=queryys.poll();
             parse.doQuereyparse(query, isStem, finalTokens);
         }
         removeStopwords();
-        getSemanitcWord(finalTokens);
+        if (isSemantic)
+            getSemanitcWord(finalTokens);
         return finalTokens;
     }
 

@@ -73,7 +73,7 @@
                </children>
             </HBox>
             <CheckBox fx:id="isShowDominantCheckbox" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#stemChecked" text="זיהוי יישויות" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
-            <Button mnemonicParsing="false" onAction="#chooseLanguage" text="choose languages" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+            <Button mnemonicParsing="false" onAction="#chooseCity" text="choose cities" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
             <CheckBox fx:id="isSemanticCheckbox" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#stemChecked" text="טיפול סמנטי" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
             <Button mnemonicParsing="false" onAction="#saveQueryResults" text="save results" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
             <Button mnemonicParsing="false" onAction="#runQuery" text="RUN" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
