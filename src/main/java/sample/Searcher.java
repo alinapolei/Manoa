@@ -15,11 +15,10 @@ public class Searcher {
     }
 
     private void removeStopwords() {
-        for (int i =0;i<Main.stopWords.size();i++)
-        {
+        for (int i = 0; i < Main.stopWords.size(); i++) {
             finalTokens.remove(Main.stopWords.toArray()[i].toString().toLowerCase());
             finalTokens.remove(Main.stopWords.toArray()[i].toString().toUpperCase());
-            String tmp=Character.toUpperCase((Main.stopWords.toArray()[i].toString().toCharArray()[0]))+(Main.stopWords.toArray()[i].toString()).substring(1).toLowerCase();
+            String tmp = Character.toUpperCase((Main.stopWords.toArray()[i].toString().toCharArray()[0])) + (Main.stopWords.toArray()[i].toString()).substring(1).toLowerCase();
             finalTokens.remove(tmp);
 
         }
