@@ -57,8 +57,13 @@ public class Ranker {
             }
             HashMap<String, Double> top50=new HashMap<>() ;
             sortRankedDocs(rankedDocs);
-            for (int i=0;i<50;i++)
-                top50.put(rankedDocs.keySet().toArray()[i].toString(),rankedDocs.get(i));
+            if(rankedDocs.size()>50)
+                for (int i=0;i<50;i++)
+                    top50.put(rankedDocs.keySet().toArray()[i].toString(), rankedDocs.get(i));
+            else
+                for(int i=0;i<rankedDocs.size();i++)
+                    top50.put(rankedDocs.keySet().toArray()[i].toString(), rankedDocs.get(i));
+
             finalresults.put(query,top50);
         }
         return finalresults;
