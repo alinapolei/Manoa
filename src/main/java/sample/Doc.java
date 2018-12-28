@@ -149,8 +149,10 @@ public class Doc {
 
     public int getLength() {
         if(length == 0) {
-            StringTokenizer tokens = new StringTokenizer(bodyText);
-            length = tokens.countTokens();
+            if(bodyText != null) {
+                StringTokenizer tokens = new StringTokenizer(bodyText);
+                length = tokens.countTokens();
+            }
         }
         return length;
     }

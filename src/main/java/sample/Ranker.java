@@ -23,7 +23,6 @@ public class Ranker {
     }
 
     public HashMap<Queryy, HashMap<String, Double>> rank(HashMap<Queryy, HashSet<String>> queries,List<String>cities) {
-        readDictionaryToMemory();
         HashMap<Queryy, HashMap<String, Double>> finalresults = new HashMap<>();
         for(Queryy query : queries.keySet()) {
             HashSet<String> finalTokens = queries.get(query);
@@ -67,15 +66,24 @@ public class Ranker {
             }
             HashMap<String, Double> top50=new HashMap<>() ;
             sortRankedDocs(rankedDocs);
-            if(rankedDocs.size()>50)
-                for (int i=0;i<50;i++) {
-                    if(rankedDocs.get(i)>0)
-                        top50.put(rankedDocs.keySet().toArray()[i].toString(), rankedDocs.get(i));
+            if(rankedDocs.size()>50) {
+                int c = 0;
+                Iterator iterator = rankedDocs.entrySet().iterator();
+                while(c<50 && iterator.hasNext()){
+                    Map.Entry<String, Double> entry = (Map.Entry<String, Double>)iterator.next();
+                    if(entry.getValue()>0) {
+                        top50.put(entry.getKey(), entry.getValue());
+                        c++;
+                    }
                 }
+            }
             else
-                for(int i=0;i<rankedDocs.size();i++)
-                    if(rankedDocs.get(i)>0)
-                        top50.put(rankedDocs.keySet().toArray()[i].toString(), rankedDocs.get(i));
+            {
+                for(Map.Entry<String, Double> entry : rankedDocs.entrySet()){
+                    if(entry.getValue()>0)
+                        top50.put(entry.getKey(), entry.getValue());
+                }
+            }
 
             finalresults.put(query,top50);
         }
@@ -191,13 +199,5 @@ public class Ranker {
             }
         }
         return allPosts;
-    }
-
-    private void readDictionaryToMemory() {
-        HashSet<String> lines = readFromDisc("Dictionary.txt");
-        for (String line : lines) {
-            String[] parts = line.split("=");
-
-        }
     }
 }
