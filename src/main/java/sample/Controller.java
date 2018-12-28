@@ -3,17 +3,12 @@ package sample;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -53,6 +48,7 @@ public class Controller {
     public CheckBox isShowDominantCheckbox;
     public CheckBox isSemanticCheckbox;
     public List<String> selectedCities;
+    public HashMap<Queryy, HashMap<String, Double>> rankedDocs;
 
     @FXML
     public void initialize(){
@@ -469,12 +465,7 @@ public class Controller {
         PrintWriter out = null;
 
         file.delete();
-        FileWriter fos = new FileWriter(file, true);
-        out = new PrintWriter(fos, true);
-        for (String string:list)
-            out.println(string);
-        list.clear();
-        out.close();
+        WrireFunc(file, list);
     }
 
 
@@ -509,7 +500,7 @@ public class Controller {
             else
                 postingpath = postingPathString + "\\withoutStem";
             Ranker ranker = new Ranker(postingpath);
-            HashMap<Queryy, HashMap<String, Double>> rankedDocs = ranker.rank(finalTokens,selectedCities);
+           rankedDocs = ranker.rank(finalTokens,selectedCities);
 
             showResults(rankedDocs);
         }
@@ -643,8 +634,36 @@ public class Controller {
         }
     }
 
-    public void saveQueryResults(ActionEvent actionEvent) {
-        File file = openFileLocation();
+    public void saveQueryResults(ActionEvent actionEvent) throws IOException {
+       // public HashMap<Queryy, HashMap<String, Double>> rankedDocs
+        File file = new File(openFileLocation() + "result.txt");
+        if(file.exists())
+            file.delete();
+        HashMap<String,Double> ranktmp;
+        List <String>list=new ArrayList<>();
+        String tmp="";
+        for (Queryy q:rankedDocs.keySet())
+        {
+            tmp=tmp+q.getNumber();
+            ranktmp=rankedDocs.get(q);
+            for (String x:ranktmp.keySet())
+            {
+                list.add(tmp+" "+"0"+" "+x+" "+ranktmp.get(x)+" "+"1"+" "+"linki");
+            }
+            tmp="";
+        }
+        PrintWriter out = null;
+        WrireFunc(file, list);
         //save the results
+    }
+
+    private void WrireFunc(File file, List <String>list) throws IOException {
+        PrintWriter out;
+        FileWriter fos = new FileWriter(file, true);
+        out = new PrintWriter(fos, true);
+        for (String string:list)
+            out.println(string);
+        list.clear();
+        out.close();
     }
 }

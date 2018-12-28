@@ -383,7 +383,7 @@ public class Parse {
         else if (Main.indexer.getDic().containsKey(tok.toUpperCase()))
                 finalTokens.add(tok.toUpperCase());
         else
-            finalTokens.add(tok);
+            finalTokens.add(tok.toUpperCase());
     }
 }
 

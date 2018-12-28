@@ -130,7 +130,7 @@ public class Indexer {
         DicEntry dicEntry=new DicEntry(term);
         terms.put(term, dicEntry);
         HashMap<String, PostEntry> linkedList = new LinkedHashMap<>();
-        linkedList.put(doc.getDocNumber(), new PostEntry(doc.getDocNumber(), isTitle));
+        linkedList.put(doc.getDocNumber(), new PostEntry(term,doc.getDocNumber(), isTitle));
         tmpPosting.put(term, linkedList);
     }
 
@@ -146,7 +146,7 @@ public class Indexer {
         HashMap<String, PostEntry> postEntries = tmpPosting.get(term);
         if(postEntries==null) {
             HashMap<String, PostEntry> linkedList = new LinkedHashMap<>();
-            linkedList.put(doc.getDocNumber(), new PostEntry(doc.getDocNumber(), isTitle));
+            linkedList.put(doc.getDocNumber(), new PostEntry(term,doc.getDocNumber(), isTitle));
             tmpPosting.put(term, linkedList);
             //doc.increaseNumOfWords();
             //if(doc.getMaxtf() == 0)
@@ -159,11 +159,13 @@ public class Indexer {
                 if(!post.isTitle() && isTitle)
                     post.setTitle(true);
                 if(terms == dic)
-                    if(doc.getMaxtf()<post.getTf())
+                    if(doc.getMaxtf()<post.getTf()) {
                         doc.setMaxtf(post.getTf());
+                        doc.setMaxTerm(post.getTerm());
+                    }
             }
             else {
-                postEntries.put(doc.getDocNumber(), new PostEntry(doc.getDocNumber(), isTitle));
+                postEntries.put(doc.getDocNumber(), new PostEntry(term,doc.getDocNumber(), isTitle));
                 DicEntry de = terms.get(term);
                 de.setDf(de.getDf()+1);
                 if(terms == dic) {
@@ -215,6 +217,7 @@ public class Indexer {
      * @throws IOException
      */
     public void transferToDisk(String path) throws IOException {
+        removetmpListfromDocs();
         removeStopWordfromtmpPosting(Main.stopWords);
         removeStopWords(Main.stopWords);
         setAllTerms();
@@ -267,6 +270,10 @@ public class Indexer {
                 */
                 }
         tmpPosting.clear();
+    }
+
+    private void removetmpListfromDocs() {
+
     }
 
     /**
@@ -378,6 +385,7 @@ public class Indexer {
             Doc doc = Main.allDocs.get(pdoc.getDocNumber());
             if (doc!=null) {
                 doc.increaseNumOfWords();
+                doc.addToHeap(pdoc);
                 if (doc.getMaxtf() < pdoc.getTf())
                     doc.setMaxtf(pdoc.getTf());
             }
@@ -425,6 +433,7 @@ public class Indexer {
      */
     private void combinePosts(HashMap<String, PostEntry> combinedPost, String termToSearch) {
         HashMap<String, PostEntry> post = tmpPosting.get(termToSearch);
+
         for(PostEntry postEntry : post.values()){
             PostEntry p = combinedPost.get(postEntry.getDocNumber());
             //Doc doc = Main.allDocs.stream().filter(x -> x.getDocNumber().equals(postEntry.getDocNumber())).findFirst().get();
@@ -434,15 +443,23 @@ public class Indexer {
                 p.setTf(p.getTf() + postEntry.getTf());
                 if(postEntry.isTitle())
                     p.setTitle(true);
-                if(doc.getMaxtf()<p.getTf())
+                if(doc.getMaxtf()<p.getTf()) {
                     doc.setMaxtf(p.getTf());
+                    doc.setMaxTerm(p.getTerm());
+                }
+                doc.addToHeap(p);
             }
             else {
                 combinedPost.put(postEntry.getDocNumber(), postEntry);
                 doc.increaseNumOfWords();
-                if(doc.getMaxtf()<postEntry.getTf())
+                if(doc.getMaxtf()<postEntry.getTf()) {
                     doc.setMaxtf(postEntry.getTf());
+                    doc.setMaxTerm(postEntry.getTerm());
+                }
+                doc.addToHeap(postEntry);
+
             }
+
         }
         tmpPosting.remove(termToSearch);
     }

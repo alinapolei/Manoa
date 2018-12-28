@@ -4,13 +4,23 @@ public class PostEntry {
     /**
      * class that represents specific post of a term in one document
      */
+    private String term;
     private String docNumber;
     private int tf=1;
     private boolean isTitle;
 
-    public PostEntry(String name, boolean isTitle) {
+    public PostEntry(String term,String name, boolean isTitle) {
+        this.term=term;
         this.isTitle = isTitle;
         this.docNumber = name;
+    }
+
+    public String getTerm() {
+        return term;
+    }
+
+    public void setTerm(String term) {
+        this.term = term;
     }
 
     public void setTf(int tf) {
@@ -40,7 +50,11 @@ public class PostEntry {
 
     @Override
     public String toString() {
-        return docNumber + ' ' +
-                 + tf + ' ' + (isTitle ? "V" : "X");
+        return "PostEntry{" +
+                "term='" + term + '\'' +
+                ", docNumber='" + docNumber + '\'' +
+                ", tf=" + tf +
+                ", isTitle=" + isTitle +
+                '}';
     }
 }
