@@ -239,24 +239,25 @@ public class Indexer {
         FileWriter fos=null;
         List<String> list1;
         for(Character x : Finalsort.keySet()) {
-                Character character = x;
-                if (!Character.isDigit(x.charValue()) && !Character.isLetter(x.charValue()) && character != '$')
+            sortList.clear();
+            Character character = x;
+                if (!Character.isDigit(x.charValue()) && !Character.isLetter(x.charValue()) && character != '$') {
                     file = new File(path + "\\" + "rest" + ".txt");
+
+                }
                 else
                     file = new File(path + "\\" + x + ".txt");
 
-                if(file.exists()) {
-                    list1 = Files.readAllLines(Paths.get((file.getPath())), StandardCharsets.ISO_8859_1);
-                }
+                if(file.exists())
+                    list1 = Files.readAllLines(Paths.get((file.getPath())));//, StandardCharsets.ISO_8859_1);
                 else
                    list1 =new ArrayList<>();
-                sortList.clear();
                 sortList = Finalsort.get(x);
                 for (String term : sortList) {
                     list = tmpPosting.get(term);
                     StringBuilder t=new StringBuilder();
                     for (PostEntry post : list.values())
-                        t.append(post.toString()+", ");
+                        t.append(post.PrinttoDoc()+", ");
                     list1.add(term + " ->" + t);
             }
             System.gc();

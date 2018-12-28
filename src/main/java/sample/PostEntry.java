@@ -51,10 +51,26 @@ public class PostEntry {
     @Override
     public String toString() {
         return "PostEntry{" +
-                "term='" + term + '\'' +
+               "term='" + term + '\'' +
                 ", docNumber='" + docNumber + '\'' +
                 ", tf=" + tf +
                 ", isTitle=" + isTitle +
                 '}';
+    }
+
+    public String PrinttoDoc() {
+      if (isTitle)
+        return "{" +
+                docNumber +
+                "|" + tf +
+                "|V"+
+                '}';
+      else
+          return "{" +
+                    docNumber +
+                  "|" + tf +
+                  "|X"+
+                  '}';
+
     }
 }

@@ -46,6 +46,6 @@ public class DicEntry {
 
     @Override
     public String toString() {
-        return  "term=" + term + "|df=" + df + "|tfCourpus=" + tfCourpus;
+        return    term + "|" + df + "|" + tfCourpus;
     }
 }

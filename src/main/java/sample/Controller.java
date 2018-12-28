@@ -388,11 +388,12 @@ public class Controller {
     private void sortAllfiles(String postingpath) throws IOException {
         File directory = new File(postingpath);
         File[] fileList = directory.listFiles();
-        HashMap <String,StringBuilder> mergefile=new HashMap<>();
+        HashMap <String,String> mergefile=new HashMap<>();
         List<String>lwrite=new ArrayList<>();
         for (File file :fileList)
         {
-            List<String> list = Files.readAllLines(Paths.get((file.getPath())), StandardCharsets.ISO_8859_1);
+            System.out.println(file.getPath());
+            List<String> list = Files.readAllLines(Paths.get((file.getPath())));//, StandardCharsets.ISO_8859_1);
             file.delete();
             Collections.sort(list);
             for (String s : list)
@@ -401,26 +402,28 @@ public class Controller {
                 if(!mergefile.containsKey(strings[0]))
                     if(!mergefile.containsKey(strings[0].toLowerCase()))
                         if(!mergefile.containsKey(strings[0].toUpperCase()))
-                            mergefile.put(strings[0], new StringBuilder(s.substring(strings[0].length())));
+                            mergefile.put(strings[0],  (s.substring(strings[0].length())));
                         else
-                            mergefile.get(strings[0].toUpperCase()).append(s.substring(strings[0].length()));
+                            mergefile.replace(strings[0].toUpperCase(),mergefile.get(strings[0].toUpperCase()),mergefile.get(strings[0].toUpperCase())+(s.substring(strings[0].length())));
+                            else
+                             mergefile.replace(strings[0].toLowerCase(),mergefile.get(strings[0].toLowerCase()),mergefile.get(strings[0].toLowerCase())+(s.substring(strings[0].length())));
                         else
-                            mergefile.get(strings[0].toLowerCase()).append(s.substring(strings[0].length()));
-                        else
-                            mergefile.get(strings[0]).append(s.substring(strings[0].length()));
+                             mergefile.replace(strings[0],mergefile.get(strings[0]),mergefile.get(strings[0])+(s.substring(strings[0].length())));
             }
+            list.clear();
+
             FileWriter fos = new FileWriter(file, true);
             PrintWriter out = new PrintWriter(fos, true);
             for (String s:mergefile.keySet())
                 lwrite.add(s +mergefile.get(s).toString());
             Collections.sort(lwrite);
+            mergefile.clear();
 
             for(String n:lwrite)
                 out.println(n);
             out.close();
 
             lwrite.clear();
-            list.clear();
             mergefile.clear();
 
         }
@@ -533,13 +536,16 @@ public class Controller {
 
     private void createDicfromPosting(List<String> lines) {
         Main.indexer=new Indexer();
-        String []tmp;
+        String [] res;
+
         for (String s:lines)
         {
-            //Main.indexer.addtoDic()
+
+            res=s.split("\\|");
+            if(res.length==3)
+                Main.indexer.addtoDic(res[0],new DicEntry(res[0],Integer.valueOf(res[1]),Integer.valueOf(res[2])));
 
         }
-        System.out.println("here");
     }
 
 
