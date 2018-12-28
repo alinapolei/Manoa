@@ -23,6 +23,7 @@ public class Ranker {
     }
 
     public HashMap<Queryy, HashMap<String, Double>> rank(HashMap<Queryy, HashSet<String>> queries,List<String>cities) {
+        readDictionaryToMemory();
         HashMap<Queryy, HashMap<String, Double>> finalresults = new HashMap<>();
         for(Queryy query : queries.keySet()) {
             HashSet<String> finalTokens = queries.get(query);
@@ -38,6 +39,7 @@ public class Ranker {
                     if(!cities.contains(doc.getCity()))
                         continue;
 
+                int count = 0;
                 sum = 0;
                 for (String term : posts.keySet()) {
                     PostEntry postEntry = posts.get(term).get(doc.getDocNumber());
@@ -51,8 +53,11 @@ public class Ranker {
                         double tmp = ((k + 1) * c_w_d) / (c_w_d + k * (1 - b + b * dLength / avdl));
                         double tmp1 = Math.log((numDocs + 1) / df_w);
                         sum += (c_w_q * tmp * tmp1);
+                        if(postEntry.isTitle())
+                            count++;
                     }
                 }
+                sum = sum * Math.pow(1.2, count);
                 rankedDocs.put(doc.getDocNumber(), sum);
             }
             HashMap<String, Double> top50=new HashMap<>() ;
@@ -169,5 +174,12 @@ public class Ranker {
             }
         }
         return allPosts;
+    }
+
+    private void readDictionaryToMemory() {
+        HashSet<String> lines = readFromDisc("Dictionary.txt");
+        for (String line : lines) {
+            String[] parts = line.split(" ");
+        }
     }
 }

@@ -32,6 +32,7 @@ import org.jsoup.select.Elements;
 
 import javax.management.Query;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -394,7 +395,7 @@ public class Controller {
         List<String>lwrite=new ArrayList<>();
         for (File file :fileList)
         {
-            List<String> list = Files.readAllLines(Paths.get((file.getPath())));
+            List<String> list = Files.readAllLines(Paths.get((file.getPath())), StandardCharsets.ISO_8859_1);
             file.delete();
             Collections.sort(list);
             for (String s : list)
@@ -489,32 +490,46 @@ public class Controller {
             alert.close();
         }
         else {
-            Queue<Queryy> queries = new ArrayDeque<>();
-            if (queryPathString != null) {
-                ReadFile readFile = new ReadFile();
-                File file = new File(queryPathString);
-                readFile.separateQueries(file, queries);
-            } else if (!query.getText().equals("")) {
-                queries.add(new Queryy(query.getText()));
-                //here
-
+            if(postingPathString.equals("")) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText("You must enter a path to the existing posting");
+                alert.showAndWait();
+                alert.close();
             }
+            else {
+                String postingpath;
+                if (isStemCheckbox.isSelected())
+                    postingpath = postingPathString + "\\withStem";
+                else
+                    postingpath = postingPathString + "\\withoutStem";
+                File tmpDir = new File(postingpath);
+                if (!tmpDir.exists()) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setHeaderText("The posting that you entered doesn't exist");
+                    alert.showAndWait();
+                    alert.close();
+                }
+                else {
+                    Queue<Queryy> queries = new ArrayDeque<>();
+                    if (queryPathString != null) {
+                        ReadFile readFile = new ReadFile();
+                        File file = new File(queryPathString);
+                        readFile.separateQueries(file, queries);
+                    } else if (!query.getText().equals("")) {
+                        queries.add(new Queryy(query.getText()));
+                    }
 
-            Searcher searcher = new Searcher();
-            HashMap<Queryy, HashSet<String>> finalTokens = searcher.search(queries, isStemCheckbox.isSelected(),isSemanticCheckbox.isSelected());
+                    Searcher searcher = new Searcher();
+                    HashMap<Queryy, HashSet<String>> finalTokens = searcher.search(queries, isStemCheckbox.isSelected(), isSemanticCheckbox.isSelected());
 
-            String postingpath;
-            if(isStemCheckbox.isSelected())
-                postingpath = postingPathString + "\\withStem";
-            else
-                postingpath = postingPathString + "\\withoutStem";
-            Ranker ranker = new Ranker(postingpath);
-            HashMap<Queryy, HashMap<String, Double>> rankedDocs = ranker.rank(finalTokens,selectedCities);
+                    Ranker ranker = new Ranker(postingpath);
+                    HashMap<Queryy, HashMap<String, Double>> rankedDocs = ranker.rank(finalTokens, selectedCities);
 
-            showResults(rankedDocs);
+                    showResults(rankedDocs);
+                }
+            }
         }
     }
-
 
     private void showResults(HashMap<Queryy, HashMap<String, Double>> rankedDocs) {
         ScrollPane root = new ScrollPane();

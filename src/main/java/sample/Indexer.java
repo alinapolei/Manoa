@@ -3,6 +3,10 @@ package sample;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -215,6 +219,8 @@ public class Indexer {
      * @throws IOException
      */
     public void transferToDisk(String path) throws IOException {
+        CharsetDecoder decoder =Charset.forName(("UTF-8")).newDecoder();
+        decoder.onMalformedInput(CodingErrorAction.IGNORE);
         removeStopWordfromtmpPosting(Main.stopWords);
         removeStopWords(Main.stopWords);
         setAllTerms();
@@ -234,7 +240,7 @@ public class Indexer {
                     file = new File(path + "\\" + x + ".txt");
 
                 if(file.exists()) {
-                    list1 = Files.readAllLines(Paths.get((file.getPath())));
+                    list1 = Files.readAllLines(Paths.get((file.getPath())), StandardCharsets.ISO_8859_1);
                 }
                 else
                    list1 =new ArrayList<>();
