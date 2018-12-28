@@ -192,7 +192,8 @@ public class Ranker {
     private void readDictionaryToMemory() {
         HashSet<String> lines = readFromDisc("Dictionary.txt");
         for (String line : lines) {
-            String[] parts = line.split(" ");
+            String[] parts = line.split("=");
+
         }
     }
 }

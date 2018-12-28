@@ -76,6 +76,10 @@ public class Indexer {
         }
     }
 
+    public void addtoDic(String term,DicEntry dicEntry) {
+        dic.put(term, dicEntry);
+    }
+
     /**
      * adds the term to the temp dictionary with lower words
      * @param term

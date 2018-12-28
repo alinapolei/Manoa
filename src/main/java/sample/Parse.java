@@ -374,16 +374,20 @@ public class Parse {
         return tok;
     }
 
-    private void quereyWordThreat(String tok,boolean isStem,HashSet<String>finalTokens)
-    {
-        if (isStem)
-            tok=stemmer.stem(tok);
-        if(Main.indexer.getDic().containsKey(tok.toLowerCase()))
-            finalTokens.add(tok.toLowerCase());
-        else if (Main.indexer.getDic().containsKey(tok.toUpperCase()))
+    private void quereyWordThreat(String tok,boolean isStem,HashSet<String>finalTokens) {
+
+        if (Main.indexer == null) {
+            System.out.println("here");
+        } else {
+            if (isStem)
+                tok = stemmer.stem(tok);
+            if (Main.indexer.getDic().containsKey(tok.toLowerCase()))
+                finalTokens.add(tok.toLowerCase());
+            else if (Main.indexer.getDic().containsKey(tok.toUpperCase()))
                 finalTokens.add(tok.toUpperCase());
-        else
-            finalTokens.add(tok.toUpperCase());
+            else
+                finalTokens.add(tok.toUpperCase());
+        }
     }
 }
 

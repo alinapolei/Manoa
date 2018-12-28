@@ -26,6 +26,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import javax.management.Query;
+import javax.swing.text.html.ImageView;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -481,7 +482,7 @@ public class Controller {
             alert.close();
         }
         else {
-            if(postingPathString.equals("")) {
+            if(postingPathString==null) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setHeaderText("You must enter a path to the existing posting");
                 alert.showAndWait();
@@ -510,6 +511,13 @@ public class Controller {
                         queries.add(new Queryy(query.getText()));
                     }
 
+                    if(Main.indexer==null||Main.indexer.getDic().isEmpty()) {
+                        List<String> lines = readFromDisc("Dictionary.txt");
+                        createDicfromPosting(lines);
+                    }
+
+
+
                     Searcher searcher = new Searcher();
                     HashMap<Queryy, HashSet<String>> finalTokens = searcher.search(queries, isStemCheckbox.isSelected(), isSemanticCheckbox.isSelected());
 
@@ -522,6 +530,19 @@ public class Controller {
             }
         }
     }
+
+    private void createDicfromPosting(List<String> lines) {
+        Main.indexer=new Indexer();
+        String []tmp;
+        for (String s:lines)
+        {
+            //Main.indexer.addtoDic()
+
+        }
+        System.out.println("here");
+    }
+
+
 
     private void showResults(HashMap<Queryy, HashMap<String, Double>> rankedDocs) {
         ScrollPane root = new ScrollPane();
@@ -682,4 +703,26 @@ public class Controller {
         list.clear();
         out.close();
     }
+
+    private List<String> readFromDisc(String s) throws IOException {
+        String postingpath;
+        if(isStemCheckbox.isSelected())
+            postingpath = postingPathString + "\\withStem";
+        else
+            postingpath = postingPathString + "\\withoutStem";
+        List<String> res= Collections.emptyList();
+        File file=new File(postingpath+"\\"+s);
+
+        if(file.exists())
+        {
+            res=Files.readAllLines(Paths.get(postingpath+"\\"+s), StandardCharsets.UTF_8);
+        }
+        else{
+            System.out.println("file not exist");
+        }
+       // System.out.println("here");
+    return res;
+    }
+
+
 }

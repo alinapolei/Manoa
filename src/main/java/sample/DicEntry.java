@@ -14,6 +14,12 @@ public class DicEntry {
         tfCourpus=1;
     }
 
+    public DicEntry(String term,int df,int tfCourpus){
+        this.term=term;
+        this.df=df;
+        this.tfCourpus=tfCourpus;
+    }
+
     public String getTerm() {
         return term;
     }
@@ -40,6 +46,6 @@ public class DicEntry {
 
     @Override
     public String toString() {
-        return  "term=" + term + " df=" + df + " tfCourpus=" + tfCourpus;
+        return  "term=" + term + "|df=" + df + "|tfCourpus=" + tfCourpus;
     }
 }
