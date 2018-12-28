@@ -143,15 +143,18 @@ public class Ranker {
             Doc doc = new Doc();
             doc.setDocNumber(parts[0]);
             for(int i=1; i<parts.length; i++){
-                String[] parts2 = parts[i].split("=");
-                if(parts2[0].equals("maxtf"))
-                    doc.setMaxtf(Integer.valueOf(parts2[1]));
-                if(parts2[0].equals("uniqueWords"))
-                    doc.setNumOfWords(Integer.valueOf(parts2[1]));
-                if(parts2[0].equals("length"))
-                    doc.setLength(Integer.valueOf(parts2[1]));
-                if(parts2[0].equals("city"))
-                    doc.setCity(parts2[1]);
+                if(parts[i].compareTo("")!=0) {
+                    String[] parts2 = parts[i].split("=");
+                    if(parts2[0].equals("maxFive"))break;
+                    if (parts2[0].equals("maxtf"))
+                        doc.setMaxtf(Integer.valueOf(parts2[1]));
+                    if (parts2[0].equals("uniqueWords"))
+                        doc.setNumOfWords(Integer.valueOf(parts2[1]));
+                    if (parts2[0].equals("length"))
+                        doc.setLength(Integer.valueOf(parts2[1]));
+                    if (parts2[0].equals("city"))
+                        doc.setCity(parts2[1]);
+                }
             }
             docs.put(doc.getDocNumber(), doc);
         }
@@ -171,8 +174,8 @@ public class Ranker {
                         HashMap<String, PostEntry> posts = new HashMap<>();
                         String[] d = parts[1].split(", ");
                         for (int i = 0; i < d.length; i++) {
-                            d[i].substring(1, parts[1].length()-1);
-                            String[] parts2 = d[i].split("|");
+                           d[i]= d[i].substring(1, d[i].length()-1);
+                            String[] parts2 = d[i].split("\\|");
                             PostEntry postEntry = new PostEntry(term,parts2[0], parts2[2].equals("V") ? true : false);
                             postEntry.setTf(Integer.valueOf(parts2[1]));
                             posts.put(postEntry.getDocNumber(), postEntry);
