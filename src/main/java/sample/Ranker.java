@@ -171,7 +171,8 @@ public class Ranker {
                         HashMap<String, PostEntry> posts = new HashMap<>();
                         String[] d = parts[1].split(", ");
                         for (int i = 0; i < d.length; i++) {
-                            String[] parts2 = d[i].split(" ");
+                            d[i].substring(1, parts[1].length()-1);
+                            String[] parts2 = d[i].split("|");
                             PostEntry postEntry = new PostEntry(term,parts2[0], parts2[2].equals("V") ? true : false);
                             postEntry.setTf(Integer.valueOf(parts2[1]));
                             posts.put(postEntry.getDocNumber(), postEntry);
