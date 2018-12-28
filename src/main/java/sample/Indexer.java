@@ -346,7 +346,7 @@ public class Indexer {
                 tmpPosting.put(term.toUpperCase(), postForEntery);
 
                 //forach doc in post docs increase anf check max
-                updateDocDetails(postForEntery);
+                updateDocDetails(postForEntery, term.toUpperCase());
             }
         }
         mixTerms.clear();
@@ -363,7 +363,7 @@ public class Indexer {
                 dic.put(term, entery.getValue());
                 //forach doc in post docs increase anf check max
                 HashMap<String, PostEntry> postForEntery = tmpPosting.get(term);
-                updateDocDetails(postForEntery);
+                updateDocDetails(postForEntery, term);
             }
         }
         upTerms.clear();
@@ -372,7 +372,7 @@ public class Indexer {
             dic.put(entery.getKey(), entery.getValue());
             //forach doc in post docs increase anf check max
             HashMap<String, PostEntry> postForEntery = tmpPosting.get(entery.getKey());
-            updateDocDetails(postForEntery);
+            updateDocDetails(postForEntery, entery.getKey());
         }
         lowTerms.clear();
     }
@@ -381,11 +381,12 @@ public class Indexer {
      * sets the maxtf and number of unique word in document according to the posting result
      * @param postForEntery - a post of a single term
      */
-    private void updateDocDetails(HashMap<String, PostEntry> postForEntery) {
+    private void updateDocDetails(HashMap<String, PostEntry> postForEntery, String finaTerm) {
         for (PostEntry pdoc : postForEntery.values()) {
             Doc doc = Main.allDocs.get(pdoc.getDocNumber());
             if (doc!=null) {
                 doc.increaseNumOfWords();
+                pdoc.setTerm(finaTerm);
                 doc.addToHeap(pdoc);
                 if (doc.getMaxtf() < pdoc.getTf())
                     doc.setMaxtf(pdoc.getTf());
@@ -404,12 +405,12 @@ public class Indexer {
     private DicEntry combineEnteries(String term, DicEntry entery, DicEntry inLow, DicEntry inUp) {
         DicEntry combinedEntery = new DicEntry(term);
         HashMap<String, PostEntry> combinedPost = new HashMap<>();
-        combinePosts(combinedPost, entery.getTerm());
+        combinePosts(combinedPost, entery.getTerm(), term);
 
         if(inLow != null) {
             combinedEntery.setTfCourpus(entery.getTfCourpus() + inLow.getTfCourpus());
 
-            combinePosts(combinedPost, inLow.getTerm());
+            combinePosts(combinedPost, inLow.getTerm(), term);
             combinedEntery.setDf(combinedPost.size());
         }
         if(inUp != null) {
@@ -419,7 +420,7 @@ public class Indexer {
             }
             combinedEntery.setTfCourpus(combinedEntery.getTfCourpus() + inUp.getTfCourpus());
 
-            combinePosts(combinedPost, inUp.getTerm());
+            combinePosts(combinedPost, inUp.getTerm(), term);
             combinedEntery.setDf(combinedPost.size());
         }
         tmpPosting.put(term, combinedPost);
@@ -432,7 +433,7 @@ public class Indexer {
      * @param combinedPost - the first post entry
      * @param termToSearch - the second post entry
      */
-    private void combinePosts(HashMap<String, PostEntry> combinedPost, String termToSearch) {
+    private void combinePosts(HashMap<String, PostEntry> combinedPost, String termToSearch, String finalTerm) {
         HashMap<String, PostEntry> post = tmpPosting.get(termToSearch);
 
         for(PostEntry postEntry : post.values()){
@@ -448,6 +449,7 @@ public class Indexer {
                     doc.setMaxtf(p.getTf());
                     doc.setMaxTerm(p.getTerm());
                 }
+                p.setTerm(finalTerm);
                 doc.addToHeap(p);
             }
             else {
@@ -457,6 +459,7 @@ public class Indexer {
                     doc.setMaxtf(postEntry.getTf());
                     doc.setMaxTerm(postEntry.getTerm());
                 }
+                postEntry.setTerm(finalTerm);
                 doc.addToHeap(postEntry);
 
             }
