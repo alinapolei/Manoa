@@ -160,7 +160,34 @@ public class Doc {
     }
 
     public void addToHeap(PostEntry postEntry) {
-        if (postEntry.getTerm().compareTo(postEntry.getTerm().toUpperCase()) == 0&&!tmplist.contains(postEntry.getTerm().toLowerCase())) {
+        if(Main.con.isAlpha(postEntry.getTerm())) {
+            if (postEntry.getTerm().compareTo(postEntry.getTerm().toLowerCase()) == 0 &&
+                    topFiveTerms.contains(postEntry.getTerm()))
+                System.out.println("think again!");
+            if (postEntry.getTerm().compareTo(postEntry.getTerm().toUpperCase()) == 0) {
+                if (topFiveTerms.contains(postEntry.getTerm())) {
+                    for (PostEntry post : maxFive) {
+                        if (post.getTerm().compareTo(postEntry.getTerm()) == 0) {
+                            maxFive.remove(post);
+                            topFiveTerms.remove(postEntry.getTerm());
+                            break;
+                        }
+                    }
+                }
+
+                if (maxFive.size() < 5) {
+                    maxFive.add(postEntry);
+                    topFiveTerms.add(postEntry.getTerm());
+                } else if (maxFive.peek().getTf() < postEntry.getTf()) {
+                    topFiveTerms.remove(maxFive.peek().getTerm());
+                    maxFive.poll();
+                    maxFive.add(postEntry);
+                    topFiveTerms.add(postEntry.getTerm());
+                }
+            }
+        }
+
+        /*if (postEntry.getTerm().compareTo(postEntry.getTerm().toUpperCase()) == 0&&!tmplist.contains(postEntry.getTerm().toLowerCase())) {
             if (topFiveTerms.contains(postEntry.getTerm())) {
                 for (PostEntry post : maxFive) {
                     if (post.getTerm().compareTo(postEntry.getTerm()) == 0) {
@@ -183,12 +210,12 @@ public class Doc {
         }
         if(postEntry.getTerm().compareTo(postEntry.getTerm().toLowerCase())==0)
             tmplist.add(postEntry.getTerm());
-
+        */
     }
     @Override
     public String toString() {
         return docNumber + " " + "maxtf=" + maxtf + " " + "uniqueWords=" + numOfWords + " " + "length=" + getLength() + " " +
-                (!city.equals("") ? ("city=" + city) : ""+ " "+"maxFive="+ " "+"[" +printMaxFive()+ "]"+" "+maxTerm);
+                (!city.equals("") ? ("city=" + city) : "") + " " + "maxFive="+ " "+"[" +printMaxFive()+ "]"+" "+maxTerm;
     }
 
     private String printMaxFive() {
