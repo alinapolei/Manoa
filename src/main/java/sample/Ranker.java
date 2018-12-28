@@ -40,6 +40,7 @@ public class Ranker {
                         continue;
 
                 int count = 0;
+                boolean isMaxterm=false;
                 sum = 0;
                 for (String term : posts.keySet()) {
                     PostEntry postEntry = posts.get(term).get(doc.getDocNumber());
@@ -55,15 +56,27 @@ public class Ranker {
                         sum += (c_w_q * tmp * tmp1);
                         if(postEntry.isTitle())
                             count++;
+                        if(postEntry.getTerm().toLowerCase().compareTo(doc.getMaxTerm().toLowerCase())==0)
+                            isMaxterm=true;
                     }
                 }
-                sum = sum * Math.pow(1.2, count);
+                sum=sum*Math.pow(1.2,count);
+                if(isMaxterm)
+                    sum=sum*1.1;
                 rankedDocs.put(doc.getDocNumber(), sum);
             }
             HashMap<String, Double> top50=new HashMap<>() ;
             sortRankedDocs(rankedDocs);
-            for (int i=0;i<50;i++)
-                top50.put(rankedDocs.keySet().toArray()[i].toString(),rankedDocs.get(i));
+            if(rankedDocs.size()>50)
+                for (int i=0;i<50;i++) {
+                    if(rankedDocs.get(i)>0)
+                        top50.put(rankedDocs.keySet().toArray()[i].toString(), rankedDocs.get(i));
+                }
+            else
+                for(int i=0;i<rankedDocs.size();i++)
+                    if(rankedDocs.get(i)>0)
+                        top50.put(rankedDocs.keySet().toArray()[i].toString(), rankedDocs.get(i));
+
             finalresults.put(query,top50);
         }
         return finalresults;
@@ -159,7 +172,7 @@ public class Ranker {
                         String[] d = parts[1].split(", ");
                         for (int i = 0; i < d.length; i++) {
                             String[] parts2 = d[i].split(" ");
-                            PostEntry postEntry = new PostEntry(parts2[0], parts2[2].equals("V") ? true : false);
+                            PostEntry postEntry = new PostEntry(term,parts2[0], parts2[2].equals("V") ? true : false);
                             postEntry.setTf(Integer.valueOf(parts2[1]));
                             posts.put(postEntry.getDocNumber(), postEntry);
                         }
