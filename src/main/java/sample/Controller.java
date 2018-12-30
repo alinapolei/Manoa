@@ -551,6 +551,7 @@ public class Controller {
 
 
     private void showResults(HashMap<Queryy, HashMap<String, Double>> rankedDocs) {
+        this.rankedDocs=rankedDocs;
         ScrollPane root = new ScrollPane();
         root.setPadding(new Insets(5));
         VBox vBox = new VBox();
@@ -679,7 +680,7 @@ public class Controller {
 
     public void saveQueryResults(ActionEvent actionEvent) throws IOException {
        // public HashMap<Queryy, HashMap<String, Double>> rankedDocs
-        File file = new File(openFileLocation() + "result.txt");
+        File file = new File(openFileLocation() + "\\result.txt");
         if(file.exists())
             file.delete();
         HashMap<String,Double> ranktmp;

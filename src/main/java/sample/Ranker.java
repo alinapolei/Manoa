@@ -65,7 +65,7 @@ public class Ranker {
                 rankedDocs.put(doc.getDocNumber(), sum);
             }
             HashMap<String, Double> top50=new HashMap<>() ;
-            sortRankedDocs(rankedDocs);
+            rankedDocs=sortRankedDocs(rankedDocs);
             if(rankedDocs.size()>50) {
                 int c = 0;
                 Iterator iterator = rankedDocs.entrySet().iterator();
