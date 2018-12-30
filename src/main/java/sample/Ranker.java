@@ -180,13 +180,15 @@ public class Ranker {
                     String[] parts = line.split(" ->");
                     if (terms.containsKey(parts[0])) {
                         HashMap<String, PostEntry> posts = new HashMap<>();
-                        String[] d = parts[1].split(", ");
-                        for (int i = 0; i < d.length; i++) {
-                           d[i]= d[i].substring(1, d[i].length()-1);
-                            String[] parts2 = d[i].split("\\|");
-                            PostEntry postEntry = new PostEntry(term,parts2[0], parts2[2].equals("V") ? true : false);
-                            postEntry.setTf(Integer.valueOf(parts2[1]));
-                            posts.put(postEntry.getDocNumber(), postEntry);
+                        for(int j=1; j<parts.length; j++) {
+                            String[] d = parts[j].split(", ");
+                            for (int i = 0; i < d.length; i++) {
+                                d[i] = d[i].substring(1, d[i].length() - 1);
+                                String[] parts2 = d[i].split("\\|");
+                                PostEntry postEntry = new PostEntry(term, parts2[0], parts2[2].equals("V") ? true : false);
+                                postEntry.setTf(Integer.valueOf(parts2[1]));
+                                posts.put(postEntry.getDocNumber(), postEntry);
+                            }
                         }
                         allPosts.put(parts[0], posts);
                     }
