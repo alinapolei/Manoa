@@ -68,7 +68,7 @@ public class Ranker {
                 sum=sum*Math.pow(2,countTitle);
                 if(isMaxterm)
                     sum=sum*1.4;
-                
+
                 sum=sum*Math.pow(1.4,countMaxFive);
 
                 rankedDocs.put(doc.getDocNumber(), sum);

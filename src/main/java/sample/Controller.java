@@ -747,4 +747,9 @@ public class Controller {
     }
 
 
+    public void clearQueryPath(ActionEvent actionEvent) {
+        queryPath.setText("");
+        queryPathString = "";
+        rankedDocs.clear();
+    }
 }
