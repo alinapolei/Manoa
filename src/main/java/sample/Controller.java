@@ -697,8 +697,14 @@ public class Controller {
             }
             tmp="";
         }
+        Collections.sort(list);
         PrintWriter out = null;
         WrireFunc(file, list);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText("File Saved Successfully");
+        alert.showAndWait();
+        alert.close();
         //save the results
     }
 
