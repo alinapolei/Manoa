@@ -575,7 +575,7 @@ public class Controller {
 
         Stage stage = new Stage();
         stage.setTitle("Results");
-        Scene scene = new Scene(root, 300, 1500);
+        Scene scene = new Scene(root, 300, 800);
         stage.setScene(scene);
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(corpusPath.getScene().getWindow());
