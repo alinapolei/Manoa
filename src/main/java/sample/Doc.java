@@ -42,6 +42,18 @@ public class Doc {
         return maxTerm;
     }
 
+    public void SetMaxfive(List<String> maxfive){
+        if (this.topFiveTerms==null)
+            this.topFiveTerms=new HashSet<>();
+        for(String word:maxfive)
+            this.topFiveTerms.add(word);
+
+    }
+
+    public HashSet<String> getTopFiveTerms() {
+        return topFiveTerms;
+    }
+
     public void setMaxTerm(String maxTerm) {
         this.maxTerm = maxTerm;
     }
@@ -214,11 +226,21 @@ public class Doc {
             tmplist.add(postEntry.getTerm());
         */
     }
+    public String getFive() {
+        String res="";
+        for (String word : topFiveTerms) {
+            res=res+ word+" ";
+        }
+
+        return res;
+    }
+
     @Override
     public String toString() {
         return docNumber + " " + "maxtf=" + maxtf + " " + "uniqueWords=" + numOfWords + " " + "length=" + getLength() + " " +
                 (!city.equals("") ? ("city=" + city) : "") + " " + "maxFive="+ " "+"[" +printMaxFive()+ "]"+" "+maxTerm;
     }
+
 
     private String printMaxFive() {
         String res="";

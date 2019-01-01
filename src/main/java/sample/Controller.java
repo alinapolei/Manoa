@@ -526,9 +526,9 @@ public class Controller {
 
 
                     Ranker ranker = new Ranker(postingpath);
-                    HashMap<Queryy, HashMap<String, Double>> rankedDocs = ranker.rank(finalTokens,selectedCities);
+                    HashMap<Queryy, HashMap<String, Double>> rankedDocs = ranker.rank(finalTokens,selectedCities, isShowDominantCheckbox.isSelected());
 
-                    showResults(rankedDocs);
+                    showResults(rankedDocs, ranker.getTopWords());
 
                 }
             }
@@ -551,7 +551,7 @@ public class Controller {
 
 
 
-    private void showResults(HashMap<Queryy, HashMap<String, Double>> rankedDocs) {
+    private void showResults(HashMap<Queryy, HashMap<String, Double>> rankedDocs, HashMap<String, String> topFive) {
         this.rankedDocs=rankedDocs;
         ScrollPane root = new ScrollPane();
         root.setPadding(new Insets(5));
@@ -563,19 +563,27 @@ public class Controller {
             TableColumn<String, String> docCol = new TableColumn<>("מסמך");
             docCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()));
             docCol.setSortType(TableColumn.SortType.ASCENDING);
+            table.getColumns().addAll(docCol);
+
+            if(isShowDominantCheckbox.isSelected() && topFive != null) {
+                TableColumn<String, String> topFiveCol = new TableColumn<>("ישויות");
+                topFiveCol.setCellValueFactory(data -> new SimpleStringProperty(topFive.get(data.getValue())));
+                table.getColumns().add(topFiveCol);
+            }
+
             // Display row data
             List list = new ArrayList(rankedDocs.get(query).keySet());
             table.setItems(FXCollections.observableList(list));
-            table.getColumns().addAll(docCol);
 
             vBox.getChildren().add(label);
             vBox.getChildren().add(table);
         }
+        vBox.setPrefWidth(550);
         root.setContent(vBox);
 
         Stage stage = new Stage();
         stage.setTitle("Results");
-        Scene scene = new Scene(root, 300, 800);
+        Scene scene = new Scene(root, 600, 800);
         stage.setScene(scene);
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(corpusPath.getScene().getWindow());

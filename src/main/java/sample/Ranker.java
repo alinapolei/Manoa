@@ -19,12 +19,13 @@ public class Ranker {
     private double b = 0.75;
     private double k = 1.2;
     private double sum =0;
+    private HashMap<String, String> topWords;
 
     public Ranker(String postingPath) {
         this.postingPath = postingPath;
     }
 
-    public HashMap<Queryy, HashMap<String, Double>> rank(HashMap<Queryy, HashSet<String>> queries,List<String>cities) {
+    public HashMap<Queryy, HashMap<String, Double>> rank(HashMap<Queryy, HashSet<String>> queries, List<String> cities, boolean isTopFive) {
         HashMap<Queryy, HashMap<String, Double>> finalresults = new HashMap<>();
         for(Queryy query : queries.keySet()) {
             HashSet<String> finalTokens = queries.get(query);
@@ -40,7 +41,8 @@ public class Ranker {
                     if(!cities.contains(doc.getCity()))
                         continue;
 
-                int count = 0;
+                int countTitle = 0;
+                int countMaxFive=0;
                 boolean isMaxterm=false;
                 sum = 0;
                 for (String term : posts.keySet()) {
@@ -56,15 +58,25 @@ public class Ranker {
                         double tmp1 = Math.log((numDocs + 1) / df_w);
                         sum += (c_w_q * tmp * tmp1);
                         if(postEntry.isTitle())
-                            count++;
+                            countTitle++;
                         if(postEntry.getTerm().toLowerCase().compareTo(doc.getMaxTerm().toLowerCase())==0)
                             isMaxterm=true;
+                        if(doc.getTopFiveTerms().contains(postEntry.getTerm().toUpperCase()))
+                            countMaxFive++;
                     }
                 }
-                sum=sum*Math.pow(1.2,count);
+                sum=sum*Math.pow(2,countTitle);
                 if(isMaxterm)
-                    sum=sum*1.1;
+                    sum=sum*1.4;
+                
+                sum=sum*Math.pow(1.4,countMaxFive);
+
                 rankedDocs.put(doc.getDocNumber(), sum);
+                if(isTopFive){
+                    if(topWords == null)
+                        topWords = new HashMap<>();
+                    topWords.put(doc.getDocNumber(), doc.getFive());
+                }
             }
             HashMap<String, Double> top50=new HashMap<>() ;
             rankedDocs=sortRankedDocs(rankedDocs);
@@ -155,7 +167,15 @@ public class Ranker {
             for(int i=1; i<parts.length; i++){
                 if(parts[i].compareTo("")!=0) {
                     String[] parts2 = parts[i].split("=");
-                    if(parts2[0].equals("maxFive"))break;
+                    if(parts2[0].equals("maxFive")){
+                        String x="";
+                        for (i=i+1;i<parts.length;i++)
+                                x=x+parts[i]+" ";
+
+                        List<String>five=getFive(x);
+                        doc.SetMaxfive(five);
+                        doc.setMaxTerm(parts[parts.length-1]);
+                    }
                     if (parts2[0].equals("maxtf"))
                         doc.setMaxtf(Integer.valueOf(parts2[1]));
                     if (parts2[0].equals("uniqueWords"))
@@ -171,6 +191,23 @@ public class Ranker {
         return docs;
     }
 
+    private List<String> getFive(String part) {
+        List<String>res=new ArrayList<>();
+        String line="";
+        char [] chars=part.toCharArray();
+        for (int i=2;i<chars.length;i++) {
+            if (chars[i] != ']')
+                line = line + chars[i];
+            else
+                break;
+            if(chars[i]==' '&&!line.equals("")) {
+                res.add(line);
+                line="";
+            }
+        }
+        return res;
+    }
+
     private HashMap<String, HashMap<String, PostEntry>> getPostEntery(HashMap<String, Integer> terms){
         String line = null;
         HashMap<String, HashMap<String, PostEntry>> allPosts = new HashMap<>();
@@ -180,6 +217,7 @@ public class Ranker {
         String[] parts;
         for (char x:strings.keySet())
         {
+
             count =0;
             try{
                 FileReader fileReader = new FileReader(postingPath + "\\" + x + ".txt");
@@ -267,5 +305,9 @@ public class Ranker {
                 }
         }
             return res;
+    }
+
+    public HashMap<String, String> getTopWords() {
+        return topWords;
     }
 }
