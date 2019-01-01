@@ -529,6 +529,7 @@ public class Controller {
                     HashMap<Queryy, HashMap<String, Double>> rankedDocs = ranker.rank(finalTokens,selectedCities);
 
                     showResults(rankedDocs);
+
                 }
             }
         }

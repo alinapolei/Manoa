@@ -1,5 +1,7 @@
 package sample;
 
+import javafx.scene.control.ComboBox;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -172,6 +174,49 @@ public class Ranker {
     private HashMap<String, HashMap<String, PostEntry>> getPostEntery(HashMap<String, Integer> terms){
         String line = null;
         HashMap<String, HashMap<String, PostEntry>> allPosts = new HashMap<>();
+        HashMap<Character,HashSet<String>>strings=getPostToSerach(terms);
+        System.out.println("here");
+        int count;
+        String[] parts;
+        for (char x:strings.keySet())
+        {
+            count =0;
+            try{
+                FileReader fileReader = new FileReader(postingPath + "\\" + x + ".txt");
+                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                while (count!=strings.get(x).size()&&(line = bufferedReader.readLine()) != null)
+                {
+                   // line=bufferedReader.readLine();
+                    if(line!=null){
+                    parts = line.split(" ->");
+                    if (strings.get(x).contains(parts[0])) {
+                        HashMap<String, PostEntry> posts = new HashMap<>();
+                        for (int j = 1; j < parts.length; j++) {
+                            String[] d = parts[j].split(", ");
+                            for (int i = 0; i < d.length; i++) {
+                                d[i] = d[i].substring(1, d[i].length() - 1);
+                                String[] parts2 = d[i].split("\\|");
+                                PostEntry postEntry = new PostEntry(parts[0], parts2[0], parts2[2].equals("V") ? true : false);
+                                postEntry.setTf(Integer.valueOf(parts2[1]));
+                                posts.put(postEntry.getDocNumber(), postEntry);
+
+                            }
+                        }
+                        count++;
+                        allPosts.put(parts[0], posts);
+                    }
+                    }
+                }
+                bufferedReader.close();
+                } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        /*
         for(String term : terms.keySet()) {
             try {
                 FileReader fileReader = new FileReader(postingPath + "\\" + term.charAt(0) + ".txt");
@@ -200,6 +245,27 @@ public class Ranker {
                 ex.printStackTrace();
             }
         }
+        */
         return allPosts;
+    }
+
+    private HashMap<Character, HashSet<String>> getPostToSerach(HashMap<String, Integer> terms) {
+        HashMap<Character,HashSet<String>> res=new HashMap<>();
+        char x;
+        for(String term : terms.keySet()) {
+                x=term.toCharArray()[0];
+                if(res.keySet().contains(x)) {
+                    if(Main.indexer.getDic().containsKey(term))
+                    res.get(x).add(term);
+                }
+                    else
+                {
+                    if(Main.indexer.getDic().containsKey(term)) {
+                        res.put(x, new HashSet<>());
+                        res.get(x).add(term);
+                    }
+                }
+        }
+            return res;
     }
 }

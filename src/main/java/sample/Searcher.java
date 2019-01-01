@@ -36,7 +36,8 @@ public class Searcher {
     }
 
     private void getSemanitcWord( HashMap<Queryy, HashSet<String>> words) throws UnirestException {
-        List<String> tmp=new ArrayList<>();
+        HashSet<String> tmp=new HashSet<>();
+        String addWord;
         for (HashSet<String> x:words.values()) {
             for(String y : x) {
                 HttpResponse<JsonNode> response = Unirest.get("https://api.datamuse.com/words?ml=" + y)
@@ -44,12 +45,19 @@ public class Searcher {
                         .header("Accept", "application/json")
                         .asJson();
                 Object map = (response.getBody().getArray());
-                if(map!=null)
-                    for (int i = 0; i<5; i++)
-                    {
-                        String addWord=((JSONArray) map).getJSONObject(i).get("word").toString();
-                        tmp.add(addWord);
-                    }
+                if(map!=null&&((JSONArray) map).length()!=0)
+                    if(((JSONArray) map).length()>5)
+                        for (int i = 0; i<5; i++)
+                        {
+                             addWord=((JSONArray) map).getJSONObject(i).get("word").toString();
+                            tmp.add(addWord);
+                        }
+                    else
+                        for(int i=0;i<((JSONArray) map).length();i++)
+                        {
+                            addWord=((JSONArray) map).getJSONObject(i).get("word").toString();
+                            tmp.add(addWord);
+                        }
             }
             for (String i:tmp)
                 x.add(i);
