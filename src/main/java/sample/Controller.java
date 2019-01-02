@@ -749,7 +749,8 @@ public class Controller {
 
     public void clearQueryPath(ActionEvent actionEvent) {
         queryPath.setText("");
-        queryPathString = "";
+        queryPathString = null;
+
         rankedDocs.clear();
     }
 }
