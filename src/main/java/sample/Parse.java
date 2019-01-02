@@ -157,7 +157,12 @@ public class Parse {
     public void doQuereyparse(Queryy query, boolean isStem,HashMap<Queryy, HashSet<String>> finalTokens) {
         initParameters();
         HashSet<String> toks = new HashSet<>();
-        tokens = (query.getTitle()+" "+query.getDesc()).split(" ");
+        String line=query.getTitle();
+        if(query.getDesc()!=null)
+            line=line+" "+query.getDesc();
+
+        //narr?
+        tokens = line.split(" ");
         for (int i = 0; i < tokens.length; i++) {
             StringBuilder tok = new StringBuilder(tokens[i]);
             boolean isDollar = false;
