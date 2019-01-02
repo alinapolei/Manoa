@@ -71,6 +71,11 @@ public class Conditions {
         return number;
     }
 
+    /**
+     * part of the parse function
+     * @param number
+     * @return
+     */
     static String getFix3(String number) {
         if (number.matches("\\d{1,3}\\,\\d\\d\\d\\,\\d\\d\\d\\,\\d\\d\\d")) {
             //10,123,000 ->10.123M
@@ -86,6 +91,11 @@ public class Conditions {
         return number;
     }
 
+    /**
+     * part of the parse function
+     * @param number
+     * @return
+     */
     static String getFix2(String number) {
         String[] parts = number.split(",");
         parts[1] = parts[1].replaceAll("0*$", "");

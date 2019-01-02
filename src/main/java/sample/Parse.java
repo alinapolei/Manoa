@@ -154,6 +154,12 @@ public class Parse {
         }
     }
 
+    /**
+     * parse the given query and puts all the parsed tokens to the given finalTokens hash
+     * @param query
+     * @param isStem
+     * @param finalTokens
+     */
     public void doQuereyparse(Queryy query, boolean isStem,HashMap<Queryy, HashSet<String>> finalTokens) {
         initParameters();
         HashSet<String> toks = new HashSet<>();
@@ -207,6 +213,14 @@ public class Parse {
         finalTokens.put(query, toks);
     }
 
+    /**
+     * part of the parse function
+     * the numbers parse
+     * @param i
+     * @param tok
+     * @param isDollar
+     * @return
+     */
     private StringBuilder C(int i, StringBuilder tok, boolean isDollar) {
         if (tok.toString().endsWith("$") || tok.toString().startsWith("$")) {
             tok=new StringBuilder(tok.toString().replace("$", ""));
@@ -332,6 +346,11 @@ public class Parse {
         return tok;
     }
 
+    /**
+     * part of the parse function
+     * @param i
+     * @param tok
+     */
     private void B(int i, StringBuilder tok) {
         tok.append( tokens[i + 1] + tokens[i + 2] + tokens[i + 3]);
         tokens[i + 1] = "";
@@ -339,6 +358,13 @@ public class Parse {
         tokens[i + 3] = "";
     }
 
+    /**
+     * part of the parse function
+     * the dates parse
+     * @param i
+     * @param tok
+     * @return
+     */
     private StringBuilder A(int i, StringBuilder tok) {
         SimpleDateFormat simpleDateFormat;
         Calendar date = new GregorianCalendar();
@@ -365,6 +391,13 @@ public class Parse {
         return tok;
     }
 
+    /**
+     * part of the parse function
+     * the quotes parse
+     * @param i
+     * @param tok
+     * @return
+     */
     private StringBuilder getStringBuilder(int i, StringBuilder tok) {
         i++;
         while (i < tokens.length && !tokens[i].endsWith("\"")) {
@@ -379,6 +412,12 @@ public class Parse {
         return tok;
     }
 
+    /**
+     * parse the given tok (word) for the appropriate case (upper/lower/mix)
+     * @param tok
+     * @param isStem
+     * @param finalTokens
+     */
     private void quereyWordThreat(String tok,boolean isStem,HashSet<String>finalTokens) {
 
         if (Main.indexer == null) {
