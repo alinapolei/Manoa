@@ -626,8 +626,8 @@ public class Controller {
             }
         }
         if(cities != null){
-            if(selectedCities != null)
-                selectedCities.clear();
+            //if(selectedCities != null)
+              //  selectedCities.clear();
 
             TableView<String> table = new TableView<>();
             TableColumn<String, Boolean> chooserCol = new TableColumn<>("chooser");
@@ -684,6 +684,8 @@ public class Controller {
 
             Button close = new Button();
             close.setText("ready");
+
+
 
             VBox root = new VBox();
             root.setPadding(new Insets(5));
@@ -794,7 +796,7 @@ public class Controller {
     public void clearQueryPath(ActionEvent actionEvent) {
         queryPath.setText("");
         queryPathString = null;
-
+        selectedCities.clear();
         rankedDocs.clear();
     }
 
