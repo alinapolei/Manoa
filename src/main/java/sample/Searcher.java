@@ -10,9 +10,21 @@ import org.json.JSONArray;
 import java.util.*;
 
 public class Searcher {
+    /**
+     * key - the query
+     * value - a set of parsed tokens that are in the key query
+     */
     HashMap<Queryy, HashSet<String>> finalTokens = new HashMap<>();
     Parse parse;
 
+    /**
+     * read the queries in the given queue, separate to tokens and parse them
+     * @param queryys - queue of queries
+     * @param isStem
+     * @param isSemantic
+     * @return a hash map with the query as the key and its parsed tokens as the value
+     * @throws UnirestException
+     */
     public HashMap<Queryy, HashSet<String>> search(Queue<Queryy> queryys,boolean isStem,boolean isSemantic) throws UnirestException {
         parse=new Parse();
         while(!queryys.isEmpty()) {
@@ -25,6 +37,9 @@ public class Searcher {
         return finalTokens;
     }
 
+    /**
+     * remove stop words from the query's tokens
+     */
     private void removeStopwords() {
         for (int i = 0; i < Main.stopWords.size(); i++) {
             finalTokens.remove(Main.stopWords.toArray()[i].toString().toLowerCase());
@@ -35,6 +50,11 @@ public class Searcher {
         }
     }
 
+    /**
+     * add to each query 5 words that are semantics for the original words in the query
+     * @param words - hash map that stores for every query its list of tokens
+     * @throws UnirestException
+     */
     private void getSemanitcWord( HashMap<Queryy, HashSet<String>> words) throws UnirestException {
         HashSet<String> tmp=new HashSet<>();
         String addWord;

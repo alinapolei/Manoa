@@ -3,6 +3,8 @@ package sample;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -626,8 +628,8 @@ public class Controller {
             }
         }
         if(cities != null){
-            //if(selectedCities != null)
-              //  selectedCities.clear();
+            if(selectedCities != null)
+                selectedCities.clear();
 
             TableView<String> table = new TableView<>();
             TableColumn<String, Boolean> chooserCol = new TableColumn<>("chooser");
@@ -684,8 +686,6 @@ public class Controller {
 
             Button close = new Button();
             close.setText("ready");
-
-
 
             VBox root = new VBox();
             root.setPadding(new Insets(5));

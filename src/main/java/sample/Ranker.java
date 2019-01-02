@@ -10,6 +10,9 @@ import java.util.*;
 
 public class Ranker {
     private String postingPath;
+    /**
+     * variables for the BM25 formula
+     */
     private int c_w_q;
     private int numDocs;
     private int df_w;
@@ -19,12 +22,28 @@ public class Ranker {
     private double b = 0.75;
     private double k = 1.2;
     private double sum =0;
+
     private HashMap<String, String> topWords;
 
+    /**
+     * constructor for the ranker
+     * @param postingPath - the path to the Posting directory on the computer
+     */
     public Ranker(String postingPath) {
         this.postingPath = postingPath;
     }
 
+    /**
+     * rank the docs for the given queries and return only the 50 biggest ranked docs for each query
+     * use the BM25 formula
+     * considers if the words of the query are in the title
+     * considers if the words of the query are in the top 5 dominant words of the doc
+     * considers if the words of the query contains the most frequent word in the doc
+     * @param queries
+     * @param cities - the selected cities by the user
+     * @param isTopFive - a boolean that represents if needed to show the 5 dominant words in the docs
+     * @return a hash map with the query as the key and its top 50 ranked docs with the rank as the value
+     */
     public HashMap<Queryy, HashMap<String, Double>> rank(HashMap<Queryy, HashSet<String>> queries, List<String> cities, boolean isTopFive) {
         HashMap<Queryy, HashMap<String, Double>> finalresults = new HashMap<>();
         for(Queryy query : queries.keySet()) {
@@ -35,6 +54,8 @@ public class Ranker {
             HashMap<String, Doc> docs = readDocsFromDisc();
 
             avdl = docs.values().stream().mapToInt((x) -> x.getLength()).average().orElse(-1);
+
+
             numDocs = docs.size();
             for (Doc doc : docs.values()) {
                 if(cities!=null &&!cities.isEmpty())
@@ -107,6 +128,11 @@ public class Ranker {
         return finalresults;
     }
 
+    /**
+     *
+     * @param unsortMap - hash of the ranked docs
+     * @return the given unsortedMap sorted by the rank from the bigger to the smaller
+     */
     private HashMap<String, Double> sortRankedDocs(HashMap<String, Double> unsortMap) {
         List<Map.Entry<String, Double>> list = new LinkedList<>(unsortMap.entrySet());
         Collections.sort(list, new Comparator<Map.Entry<String, Double>>() {
@@ -123,6 +149,11 @@ public class Ranker {
         return sortedMap;
     }
 
+    /**
+     *
+     * @param finaltokens - tokens of the query
+     * @return the given finaltokens without double words
+     */
     private HashMap<String, Integer> getUniqueTokens(HashSet<String> finaltokens){
         HashMap<String, Integer> uniqueTokens = new HashMap<>();
         for(String token : finaltokens) {
@@ -136,10 +167,19 @@ public class Ranker {
         return uniqueTokens;
     }
 
+    /**
+     *
+     * @return the docs from the Documents.txt file from the Posting directory
+     */
     private HashMap<String, Doc> readDocsFromDisc(){
         return separate(readFromDisc("Documents.txt"));
     }
 
+    /**
+     *
+     * @param file
+     * @return a list with lines of the given file
+     */
     private HashSet<String> readFromDisc(String file){
         String line = null;
         try {
@@ -161,6 +201,11 @@ public class Ranker {
         return null;
     }
 
+    /**
+     *
+     * @param lines - lines from the Documents.txt file from the Posting directory
+     * @return hashMap with the Doc objects of each line in the given lines
+     */
     private HashMap<String, Doc> separate(HashSet<String> lines){
         HashMap<String, Doc> docs = new HashMap<>();
         for(String line : lines){
@@ -194,6 +239,11 @@ public class Ranker {
         return docs;
     }
 
+    /**
+     *
+     * @param part
+     * @return a list of the words in the given part string
+     */
     private List<String> getFive(String part) {
         List<String>res=new ArrayList<>();
         String line="";
@@ -211,6 +261,11 @@ public class Ranker {
         return res;
     }
 
+    /**
+     *
+     * @param terms - terms in the query
+     * @return the appropriate PostEntery object for each term in the given terms list, that was saved to the disk
+     */
     private HashMap<String, HashMap<String, PostEntry>> getPostEntery(HashMap<String, Integer> terms){
         String line = null;
         HashMap<String, HashMap<String, PostEntry>> allPosts = new HashMap<>();
@@ -290,6 +345,11 @@ public class Ranker {
         return allPosts;
     }
 
+    /**
+     *
+     * @param terms
+     * @return hashmap with the given terms grouped by the first letter
+     */
     private HashMap<Character, HashSet<String>> getPostToSerach(HashMap<String, Integer> terms) {
         HashMap<Character,HashSet<String>> res=new HashMap<>();
         char x;
