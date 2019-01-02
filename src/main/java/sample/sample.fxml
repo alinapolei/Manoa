@@ -37,7 +37,7 @@
                  <TextField fx:id="postingPath" disable="true" prefHeight="31.0" prefWidth="240.0" promptText="path for the posting" GridPane.rowIndex="1" />
              </HBox>
             <CheckBox fx:id="isStemCheckbox" mnemonicParsing="false" onAction="#stemChecked" text="stem" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
-            <ComboBox fx:id="languageChooserComboBox" onAction="#languageChooser" promptText="choose language" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+            <ComboBox fx:id="languageChooserComboBox" onAction="#languageChooser" promptText="choose language" GridPane.halignment="CENTER" GridPane.rowIndex="3" onMouseClicked="#fillLang">
       </ComboBox>
             <Button mnemonicParsing="false" onAction="#resetButton" text="reset" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
              <HBox alignment="CENTER" GridPane.rowIndex="5">

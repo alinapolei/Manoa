@@ -12,6 +12,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
@@ -376,6 +377,23 @@ public class Controller {
              readFile.setLangANDccITY(file);
         }
         Main.CityStorage=null;
+        WriteLangtoDisk();
+
+    }
+
+    private void WriteLangtoDisk() throws IOException {
+        File file;
+        List<String>lang=new ArrayList<>();
+        if(isStemCheckbox.isSelected())
+            file=new File( postingPathString + "\\withStem\\lang.txt");
+        else
+            file = new File(postingPathString + "\\withoutStem\\lang.txt");
+
+        for (String l:Main.lang.keySet())
+            lang.add(l);
+        WrireFunc(file,lang);
+        lang.clear();
+
     }
 
     /**
@@ -778,5 +796,27 @@ public class Controller {
         queryPathString = null;
 
         rankedDocs.clear();
+    }
+
+    public void fillLang(MouseEvent mouseEvent) throws IOException {
+        if(languageChooserComboBox.getItems().size()==0&&!postingPath.getText().equals("")) {
+            File file;
+            List<String> lang = new ArrayList<>();
+            if (isStemCheckbox.isSelected())
+                file = new File(postingPathString + "\\withStem\\lang.txt");
+            else
+                file = new File(postingPathString + "\\withoutStem\\lang.txt");
+
+            if (file.exists()) {
+                lang = FileUtils.readLines(file);
+                Collections.sort(lang);
+                languageChooserComboBox.getItems().setAll(lang);
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText("File lang.txt not found on posting path");
+                alert.showAndWait();
+                alert.close();
+            }
+        }
     }
 }
