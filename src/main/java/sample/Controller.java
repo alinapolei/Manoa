@@ -21,12 +21,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 
-import javax.management.Query;
-import javax.swing.text.html.ImageView;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -52,6 +47,8 @@ public class Controller {
     public List<String> selectedCities;
     public HashMap<Queryy, HashMap<String, Double>> rankedDocs;
 
+
+    static List<String>cities=null;
     @FXML
     public void initialize(){
         /**
@@ -603,7 +600,14 @@ public class Controller {
     }
 
     public void chooseCity(ActionEvent actionEvent) {
-        if(Main.citycorp != null){
+        if(cities==null) {
+            try {
+               cities= loadCity();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if(cities != null){
             if(selectedCities != null)
                 selectedCities.clear();
 
@@ -650,14 +654,14 @@ public class Controller {
             cityCol.setSortType(TableColumn.SortType.ASCENDING);
 
             // Display row data
-            List list = new ArrayList(Main.citycorp.keySet());
-            Collections.sort(list, new Comparator<String>() {
+            //List list = new ArrayList(Main.citycorp.keySet());
+            Collections.sort(cities, new Comparator<String>() {
                 @Override
                 public int compare(String o1, String o2) {
                     return o1.compareTo(o2);
                 }
             });
-            table.setItems(FXCollections.observableList(list));
+            table.setItems(FXCollections.observableList(cities));
             table.getColumns().addAll(chooserCol, cityCol);
 
             Button close = new Button();
@@ -685,6 +689,28 @@ public class Controller {
             alert.setContentText("You must hit before the start button");
             alert.showAndWait();
         }
+    }
+
+    private List<String> loadCity() throws IOException {
+        File file;
+        HashSet<String>cities=null;
+        List<String>res =null;
+        if(postingPath.getText()!=null&&!postingPath.getText().equals("")) {
+            if (isStemCheckbox.isSelected())
+                file = new File(postingPathString + "\\withStem\\cities.txt");
+            else
+                file = new File(postingPathString + "\\withoutStem\\cities.txt");
+            cities=new HashSet<>() ;
+            res=FileUtils.readLines(file);
+            for (String line :res)
+                if(Character.isLetter(line.split("  ")[0].toCharArray()[0]))
+                cities.add(line.split("  ")[0]);
+           res.clear();
+           res=new ArrayList<>();
+            for (String city:cities)
+                res.add(city);
+        }
+        return res;
     }
 
     public void saveQueryResults(ActionEvent actionEvent) throws IOException {

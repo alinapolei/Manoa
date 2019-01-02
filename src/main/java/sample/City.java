@@ -31,6 +31,7 @@ public class City {
         this.Country=country;
     }
 
+
     /*
     public ArrayList<Integer> getDocplace() {
         if (docplace==null)
