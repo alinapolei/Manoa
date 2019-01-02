@@ -10,6 +10,9 @@ import java.util.*;
 
 public class Ranker {
     private String postingPath;
+    /**
+     * variables for the BM25 formula
+     */
     private int c_w_q;
     private int numDocs;
     private int df_w;
@@ -19,12 +22,28 @@ public class Ranker {
     private double b = 0.75;
     private double k = 1.2;
     private double sum =0;
+
     private HashMap<String, String> topWords;
 
+    /**
+     * constructor for the ranker
+     * @param postingPath - the path to the Posting directory on the computer
+     */
     public Ranker(String postingPath) {
         this.postingPath = postingPath;
     }
 
+    /**
+     * rank the docs for the given queries and return only the 50 biggest ranked docs for each query
+     * use the BM25 formula
+     * considers if the words of the query are in the title
+     * considers if the words of the query are in the top 5 dominant words of the doc
+     * considers if the words of the query contains the most frequent word in the doc
+     * @param queries
+     * @param cities - the selected cities by the user
+     * @param isTopFive - a boolean that represents if needed to show the 5 dominant words in the docs
+     * @return a hash map with the query as the key and its top 50 ranked docs with the rank as the value
+     */
     public HashMap<Queryy, HashMap<String, Double>> rank(HashMap<Queryy, HashSet<String>> queries, List<String> cities, boolean isTopFive) {
         HashMap<Queryy, HashMap<String, Double>> finalresults = new HashMap<>();
         for(Queryy query : queries.keySet()) {
@@ -35,6 +54,8 @@ public class Ranker {
             HashMap<String, Doc> docs = readDocsFromDisc();
 
             avdl = docs.values().stream().mapToInt((x) -> x.getLength()).average().orElse(-1);
+
+
             numDocs = docs.size();
             for (Doc doc : docs.values()) {
                 if(cities!=null &&!cities.isEmpty())
@@ -104,6 +125,11 @@ public class Ranker {
         return finalresults;
     }
 
+    /**
+     * 
+     * @param unsortMap
+     * @return
+     */
     private HashMap<String, Double> sortRankedDocs(HashMap<String, Double> unsortMap) {
         List<Map.Entry<String, Double>> list = new LinkedList<>(unsortMap.entrySet());
         Collections.sort(list, new Comparator<Map.Entry<String, Double>>() {

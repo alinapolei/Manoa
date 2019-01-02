@@ -3,6 +3,8 @@ package sample;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -608,14 +610,18 @@ public class Controller {
             }
         }
         if(cities != null){
-            if(selectedCities != null)
-                selectedCities.clear();
+            //if(selectedCities != null)
+                //selectedCities.clear();
 
             TableView<String> table = new TableView<>();
             TableColumn<String, Boolean> chooserCol = new TableColumn<>("chooser");
             TableColumn<String, String> cityCol = new TableColumn<>("city");
             // Defines how to fill data for each cell.
-            chooserCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
+            chooserCol.setCellValueFactory(new PropertyValueFactory<>("abc"));/*cellData -> {
+                if(selectedCities!= null && selectedCities.contains(cellData.getValue()))
+                    return new SimpleBooleanProperty(true);
+                return new SimpleBooleanProperty(false);
+            });*/
             Callback<TableColumn<String, Boolean>, TableCell<String, Boolean>> cellFactory
                     = new Callback<TableColumn<String, Boolean>, TableCell<String, Boolean>>() {
                 @Override
@@ -666,6 +672,17 @@ public class Controller {
 
             Button close = new Button();
             close.setText("ready");
+
+            if(selectedCities!= null ) {
+                for (Object row : table.getItems()) {
+                    TableColumn tableColumn = (TableColumn) table.getColumns().get(0);
+                    if (selectedCities.contains(row))
+                        ((CheckBox) tableColumn.getCellObservableValue(row)).setSelected(true);
+                    else
+                        ((CheckBox) tableColumn.getCellObservableValue(row)).setSelected(false);
+                }
+            }
+
 
             VBox root = new VBox();
             root.setPadding(new Insets(5));
