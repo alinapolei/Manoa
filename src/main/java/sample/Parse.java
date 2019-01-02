@@ -162,6 +162,13 @@ public class Parse {
             line=line+" "+query.getDesc();
 
         //narr?
+        /*
+        String x;
+        if(query.getNarr()!=null) {
+            x = clearNarr(query.getNarr());
+            line=line+" "+x;
+        }
+*/
         tokens = line.split(" ");
         for (int i = 0; i < tokens.length; i++) {
             StringBuilder tok = new StringBuilder(tokens[i]);
@@ -205,6 +212,27 @@ public class Parse {
             toks.add(tok.toString());
         }
         finalTokens.put(query, toks);
+    }
+
+    private String clearNarr(String narr) {
+        String [] tmp=null;
+        if(narr.contains("not relevant:"))
+            tmp= narr.split("not relevant:")[0].split(" ");
+        else if(narr.contains("non-relevant."))
+            tmp= narr.split("\\.")[0].split(" ");
+        else if(narr.contains("not relevant.")) {
+            if (narr.split("not relevant.").length == 1)
+                tmp = narr.split("not relevant.")[0].split("\\.")[0].split(" ");
+            else if(narr.split("not relevant.").length == 2)
+                tmp = narr.split("not relevant.")[1].split(" ");
+        }
+            else
+            tmp=narr.split(" ");
+        List<String>res=new ArrayList<>();
+        for(String word :tmp)
+            if(Main.indexer.getDic().containsKey(word.toLowerCase())||Main.indexer.getDic().containsKey(word.toUpperCase()))
+                res.add(word);
+            return res.toString();
     }
 
     private StringBuilder C(int i, StringBuilder tok, boolean isDollar) {

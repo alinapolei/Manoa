@@ -68,8 +68,8 @@ public class ReadFile {
             for (i = 0; i < x.size(); i++) {
                 query.setNumber(x.get(i).getElementsByTag("num").text().split(" ")[1]);
                 query.setTitle(x.get(i).getElementsByTag("title").text());
-                query.setDesc(x.get(i).getElementsByTag("desc").text().split("Narrative:")[0].split(" ")[1]);
-                query.setNarr(x.get(i).getElementsByTag("narr").text().split(" ")[1]);
+                query.setDesc(x.get(i).getElementsByTag("desc").text().split("Narrative:")[0]);
+                query.setNarr(x.get(i).getElementsByTag("narr").text());
 
                 hashSet.add(query);
                 query = new Queryy();

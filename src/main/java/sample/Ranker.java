@@ -41,6 +41,7 @@ public class Ranker {
                     if(!cities.contains(doc.getCity()))
                         continue;
 
+                int countx=0;
                 int countTitle = 0;
                 int countMaxFive=0;
                 boolean isMaxterm=false;
@@ -65,11 +66,13 @@ public class Ranker {
                             countMaxFive++;
                     }
                 }
-                sum=sum*Math.pow(2,countTitle);
-                if(isMaxterm)
-                    sum=sum*1.4;
+                
+                    sum=sum*Math.pow(1.15,countTitle);
 
-                sum=sum*Math.pow(1.4,countMaxFive);
+                if(isMaxterm)
+                   sum=sum*1.25;
+
+                //sum=sum*Math.pow(1.09,countMaxFive);
 
                 rankedDocs.put(doc.getDocNumber(), sum);
                 if(isTopFive){
